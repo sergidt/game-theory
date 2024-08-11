@@ -16,34 +16,34 @@ extend({ Mesh, ShapeGeometry, MeshBasicMaterial });
       <ngt-primitive *args="[board()?.scene]"/>
 
       <ngt-primitive *args="[roundBig1()?.scene]"
-        [color]="black"
+        color="black"
          [position]="[57,0, 57]"/>
       <ngt-primitive *args="[roundBig2()?.scene]"
-        [color]="black"
+        color="black"
         [position]="[57,0, 20]"/>
       <ngt-primitive *args="[roundSmall1()?.scene]"
-        [color]="black"
+        color="black"
         [position]="[57,0, -19]"/>
       <ngt-primitive *args="[roundSmall2()?.scene]"
-        [color]="black"
+        color="black"
         [position]="[57,0, -57]"/>
 
       <!-- SQUARE -->
       <ngt-primitive *args="[squareBig1()?.scene]"
-      [color]="red"
+      color="red"
       [position]="[-57,0, -57]"
       [scale]="0.8"
       />
       <ngt-primitive *args="[squareBig2()?.scene]"
-        [color]="red"
+        color="red"
         [position]="[-57,0, -20]"
            [scale]="0.8"/>
       <ngt-primitive *args="[squareSmall1()?.scene]"
-        [color]="red"
+        color="red"
         [position]="[-57,0, 19]"
            [scale]="0.8"/>
       <ngt-primitive *args="[squareSmall2()?.scene]"
-        [color]="red"
+        color="red"
         [position]="[-57,0, 57]"
            [scale]="0.8"/>
       </ngt-group>
@@ -55,9 +55,6 @@ extend({ Mesh, ShapeGeometry, MeshBasicMaterial });
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Board {
-  black = new THREE.Color(0x000000);
-  red = new THREE.Color(0xff0000);
-
   board = injectLoader(
     () => GLTFLoader, () => '/assets/board.glb',
     {
