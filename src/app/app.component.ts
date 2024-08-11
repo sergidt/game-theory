@@ -9,7 +9,11 @@ import { GLTFLoader } from 'three-stdlib';
     selector: 'app-root',
     standalone: true,
     imports: [RouterOutlet, NgtCanvas],
-    templateUrl: './app.component.html',
+    template: `
+    <ngt-canvas [sceneGraph]="sceneGraph" >
+    <ngt-ambient-light [intensity]="0.5"/>
+    </ngt-canvas>
+    `,
     styleUrl: './app.component.css',
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
