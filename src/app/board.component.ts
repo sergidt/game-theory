@@ -15,44 +15,29 @@ extend({ Mesh, ShapeGeometry, MeshBasicMaterial });
       <ngt-group [parameters]="{scale: 0.022, rotation: [-100, -60 , 0]}">
         <ngt-primitive *args="[board()?.scene]"/>
 
-        <!--DARK PIECES -->
-        <ngt-primitive *args="[roundBigDark1()?.scene]"
-                       [position]="[57,0, 57]"/>
-        <ngt-primitive *args="[roundBigDark2()?.scene]"
-                       [position]="[57,0, 20]"/>
-        <ngt-primitive *args="[roundSmallDark1()?.scene]"
-                       [position]="[57,0, -19]"/>
-        <ngt-primitive *args="[roundSmallDark2()?.scene]"
-                       [position]="[57,0, -57]"/>
 
-        <ngt-primitive *args="[squareBigDark1()?.scene]"
-                       [position]="[-57,0, -57]"/>
-        <ngt-primitive *args="[squareBigDark2()?.scene]"
-                       [position]="[-57,0, -20]"/>
-        <ngt-primitive *args="[squareSmallDark1()?.scene]"
-                       [position]="[-57,0, 19]"/>
-        <ngt-primitive *args="[squareSmallDark2()?.scene]"
-                       [position]="[-57,0, 57]"/>
+        <!--DARK PIECES -->
+        <ngt-primitive *args="[roundBigDark1()?.scene]" [position]="[57,0, 57]"/>
+        <ngt-primitive *args="[roundBigDark2()?.scene]" [position]="[57,0, 20]"/>
+        <ngt-primitive *args="[roundSmallDark1()?.scene]" [position]="[57,0, -19]"/>
+        <ngt-primitive *args="[roundSmallDark2()?.scene]" [position]="[57,0, -57]"/>
+
+        <ngt-primitive *args="[squareBigDark1()?.scene]" [position]="[-57,0, -57]"/>
+        <ngt-primitive *args="[squareBigDark2()?.scene]" [position]="[-57,0, -20]"/>
+        <ngt-primitive *args="[squareSmallDark1()?.scene]" [position]="[-57,0, 19]"/>
+        <ngt-primitive *args="[squareSmallDark2()?.scene]" [position]="[-57,0, 57]"/>
 
                        <!-- LIGHT PIECES -->
 
-                       <ngt-primitive *args="[roundBigLight1()?.scene]"
-                       [position]="[20,0, 57]"/>
-        <ngt-primitive *args="[roundBigLight2()?.scene]"
-                       [position]="[20,0, 20]"/>
-        <ngt-primitive *args="[roundSmallLight1()?.scene]"
-                       [position]="[20,0, -19]"/>
-        <ngt-primitive *args="[roundSmallLight2()?.scene]"
-                       [position]="[20,0, -57]"/>
+        <!--ngt-primitive *args="[roundBigLight1()?.scene]" [position]="[20,0, 57]"/>
+        <ngt-primitive *args="[roundBigLight2()?.scene]" [position]="[20,0, 20]"/>
+        <ngt-primitive *args="[roundSmallLight1()?.scene]" [position]="[20,0, -19]"/>
+        <ngt-primitive *args="[roundSmallLight2()?.scene]" [position]="[20,0, -57]"/>
 
-        <ngt-primitive *args="[squareBigLight1()?.scene]"
-                       [position]="[-18,0, -57]"/>
-        <ngt-primitive *args="[squareBigLight2()?.scene]"
-                       [position]="[-18,0, -20]"/>
-        <ngt-primitive *args="[squareSmallLight1()?.scene]"
-                       [position]="[-18,0, 19]"/>
-        <ngt-primitive *args="[squareSmallLight2()?.scene]"
-                       [position]="[-18,0, 57]"/>
+        <ngt-primitive *args="[squareBigLight1()?.scene]" [position]="[-18,0, -57]"/>
+        <ngt-primitive *args="[squareBigLight2()?.scene]" [position]="[-18,0, -20]"/>
+        <ngt-primitive *args="[squareSmallLight1()?.scene]" [position]="[-18,0, 19]"/>
+        <ngt-primitive *args="[squareSmallLight2()?.scene]" [position]="[-18,0, 57]"/-->
       </ngt-group>
 
       <ngts-orbit-controls/>
