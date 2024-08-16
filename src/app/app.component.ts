@@ -17,9 +17,11 @@ import { Game } from './game-engine';
     `,
     styles: [`
                :host {
-                 display: block;
+                 display: flex;
+                 flex-direction: column;
+                 align-items: flex-end;
                  width: 100%;
-                 height: 800px;
+                 height: 80vh;
                }
              `],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
