@@ -47,7 +47,7 @@ export class GamePieceComponent {
   attachColor = createAttachFunction<Color, Mesh>(({ parent, child }) => {
     const mesh = parent as Mesh<BufferGeometry, MeshStandardMaterial>;
     const oldColor = mesh.material['color'];
-    mesh.material.color.set(['white', 'red'][this.index() % 2]);
+    mesh.material.color.set(['#eacdc2', '#1d3557'][this.index() % 2]);
     return () => mesh.material.color.set(oldColor);
   });
 }

@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, viewChild, ElementRef } from '@angular/core';
-import { extend, injectLoader, NgtArgs, NgtPrimitive, NgtSelection, NgtVector3 } from 'angular-three';
+import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, viewChild, ElementRef, effect, signal } from '@angular/core';
+import { extend, injectLoader, NgtArgs, NgtGroup, NgtPrimitive, NgtSelection, NgtVector3 } from 'angular-three';
 import { NgtsCameraControls, NgtsOrbitControls } from 'angular-three-soba/controls';
 import { NgtsEnvironment } from 'angular-three-soba/staging';
-import { Color, Group, Material, Mesh, MeshBasicMaterial, MeshStandardMaterial, ShapeGeometry, SRGBColorSpace, TextureLoader } from 'three';
+import { Color, Group, Material, Mesh, MeshBasicMaterial, MeshStandardMaterial, ShapeGeometry, SRGBColorSpace, TextureLoader, TorusGeometry } from 'three';
 import { GLTFLoader } from 'three-stdlib';
 import { Colour, Position } from './definitions';
 import * as THREE from 'three';
@@ -17,39 +17,37 @@ export interface PieceDefinition {
 
 const PIECES: PieceDefinition[] = [
   { path: '/assets/round-big-hole.glb', initialPosition: [80, -12, -130] },
-  { path: '/assets/round-big-no-hole.glb', initialPosition:[50, -12, -130]},
+  { path: '/assets/round-big-no-hole.glb', initialPosition: [50, -12, -130] },
   { path: '/assets/square-big-hole.glb', initialPosition: [20, -12, -130] },
-  { path: '/assets/square-big-no-hole.glb', initialPosition:    [-10, -12, -130] },
-  { path: '/assets/round-small-hole.glb', initialPosition:   [80, -12, -160]},
-  { path: '/assets/round-small-no-hole.glb', initialPosition: [50, -12, -160]},
-  { path: '/assets/square-small-hole.glb', initialPosition:   [20, -12, -160]},
-  { path: '/assets/square-small-no-hole.glb', initialPosition:  [-10, -12, -160] },
+  { path: '/assets/square-big-no-hole.glb', initialPosition: [-10, -12, -130] },
+  { path: '/assets/round-small-hole.glb', initialPosition: [80, -12, -160] },
+  { path: '/assets/round-small-no-hole.glb', initialPosition: [50, -12, -160] },
+  { path: '/assets/square-small-hole.glb', initialPosition: [20, -12, -160] },
+  { path: '/assets/square-small-no-hole.glb', initialPosition: [-10, -12, -160] },
   //
   { path: '/assets/round-big-hole.glb', initialPosition: [-40, -12, -130] },
-  { path: '/assets/round-big-no-hole.glb', initialPosition:[-70, -12, -130]},
+  { path: '/assets/round-big-no-hole.glb', initialPosition: [-70, -12, -130] },
   { path: '/assets/square-big-hole.glb', initialPosition: [-100, -12, -130] },
-  { path: '/assets/square-big-no-hole.glb', initialPosition:    [-130, -12, -130] },
-  { path: '/assets/round-small-hole.glb', initialPosition:   [-40, -12, -160]},
-  { path: '/assets/round-small-no-hole.glb', initialPosition: [-70, -12, -160]},
-  { path: '/assets/square-small-hole.glb', initialPosition:   [-100, -12, -160]},
-  { path: '/assets/square-small-no-hole.glb', initialPosition:  [-130, -12, -160] }
+  { path: '/assets/square-big-no-hole.glb', initialPosition: [-130, -12, -130] },
+  { path: '/assets/round-small-hole.glb', initialPosition: [-40, -12, -160] },
+  { path: '/assets/round-small-no-hole.glb', initialPosition: [-70, -12, -160] },
+  { path: '/assets/square-small-hole.glb', initialPosition: [-100, -12, -160] },
+  { path: '/assets/square-small-no-hole.glb', initialPosition: [-130, -12, -160] }
 
 ];
 
-
-
-
-
-extend({ Mesh, ShapeGeometry, MeshBasicMaterial });
+extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry });
 
 @Component({
   selector: 'board',
   standalone: true,
   template: `
-      <ngt-group [parameters]="{scale: 0.020, rotation: [-100, MATH.PI / 1.2, 0]}">
+
+
+      <ngt-group #group [parameters]="{scale: 0.020, rotation: [-0.1, Math.PI, 1.2]}">
         <ngt-primitive #board *args="[board()?.scene]"/>
 
-        <ngt-group >
+      <ngt-group >
         @for (piece of pieces; track $index; let i = $index) {
                   <game-piece [url]="piece.path"
                   [index]="i"
@@ -59,6 +57,17 @@ extend({ Mesh, ShapeGeometry, MeshBasicMaterial });
 
         }
           </ngt-group>
+
+          <ngt-group>
+          @for (position of torusPositions; track $index; let i = $index) {
+          <ngt-mesh [parameters]="{rotation: [Math.PI / 2, 0, 0], position}"
+          (pointerover)="torusIndexHovered.set(i)"
+          (pointerout)="torusIndexHovered.set(-1)">
+              <ngt-mesh-standard-material [color]="torusIndexHovered() === i ? 'indianred': 'white'"/>
+              <ngt-torus-geometry *args="torusGeometryArgs"/>
+          </ngt-mesh>
+        }
+      </ngt-group>
       </ngt-group>
 
       <ngts-orbit-controls/>
@@ -70,13 +79,30 @@ extend({ Mesh, ShapeGeometry, MeshBasicMaterial });
 })
 export class Board {
   pieces = PIECES;
-  MATH = Math;
+  Math = Math;
+
+  torusPositions: Array<NgtVector3> = [
+     [57, 0, 57], [57, 0, 19], [57, 0, -19], [57, 0, -57],
+    [19, 0, -57], [19, 0, 19], [19, 0, -19], [19, 0, 57],
+    [-19, 0, 57],[-19, 0, 19],[-19, 0, -19], [-19, 0, -57],
+    [-57, 0, -57], [-57, 0, -19], [-57, 0, 19], [-57, 0, 57]
+  ];
+
+  torusIndexHovered = signal(-1);
+
+  torusGeometryArgs = [17, 1.8, 100, 100];
 
   texture = injectLoader(() => TextureLoader, () => '/assets/wood.jpg');
 
-  meshRef = viewChild.required<ElementRef<Mesh>>('mesh');
-
-  board = injectLoader(() => GLTFLoader, () => '/assets/board.glb');
+  board = injectLoader(
+    () => GLTFLoader, () => '/assets/board.glb',
+    {
+      onLoad: ({ scene }: { scene: NgtGroup }) => {
+        if (scene['add'] !== undefined) {
+          scene.add(new THREE.AxesHelper(200));
+        }
+      }
+    }
+  );
 }
-
 
