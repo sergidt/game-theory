@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-    selector: 'shuffle',
+    selector: 'shuffle-pieces',
     standalone: true,
     imports: [],
     template: `
@@ -10,6 +10,6 @@ import { Component } from '@angular/core';
     styles: `
     `
 })
-export class ShuffleComponent {
+export class ShufflePiecesComponent {
 
 }

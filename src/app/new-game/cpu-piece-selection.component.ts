@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-    selector: 'app-cpu-piece-selection',
+    selector: 'cpu-piece-selection',
     standalone: true,
     imports: [],
     template: `

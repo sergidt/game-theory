@@ -1,10 +1,11 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NgtCanvas } from 'angular-three';
 import { Board } from './board.component';
 import { AppButtonComponent } from './button.component';
 import { GameDialogComponent } from './dialog.component';
 import { GameDescriptionComponent } from './game-description.component';
+import { Game } from './game-engine';
 import { NewGameComponent } from './new-game/new-game.component';
 
 export enum GameOptions {
@@ -44,7 +45,7 @@ export enum GameOptions {
             @if (viewState() === GameOptions.HowToPlay) {
               <game-description/>
             } @else {
-              <new-game/>
+              <new-game [gameState]="game.currentState()"/>
             }
 
           </div>
@@ -63,6 +64,7 @@ export enum GameOptions {
 export class AppComponent {
     protected sceneGraph = Board;
     protected viewState = signal<GameOptions>(GameOptions.NewGame);
+    protected game = inject(Game);
 
     GameOptions = GameOptions;
 }

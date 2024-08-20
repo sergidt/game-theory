@@ -1,6 +1,6 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { Board, number2binary, PieceProperties, Position } from './definitions';
-import { GameState } from './state-machine';
+import { GameState, GameStates } from './state-machine';
 
 @Injectable({ providedIn: 'root' })
 export class Game {
@@ -17,7 +17,7 @@ export class Game {
 
     #moves: WritableSignal<Position[]> = signal<Position[]>([]);
 
-    currentState = signal<GameState | undefined>(undefined);
+    currentState = signal<GameState>(GameStates.NewGame);
 
     get board() {
         return this.#board;
