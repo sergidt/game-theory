@@ -1,7 +1,6 @@
 
 .material-symbols-rounded {
-  font-variation-settings:
-  'FILL' 0,
+  font-variation-settings: 'FILL' 0,
   'wght' 400,
   'GRAD' 0,
   'opsz' 24
@@ -19,4 +18,55 @@ body {
   font-family: "Kalam", cursive;
   font-weight: 400;
   font-style: normal;
+  user-select: none;
+}
+
+.title {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+  width: 60%;
+}
+
+.main-content {
+  display: flex;
+  height: 100%;
+  align-items: center;
+
+  ngt-canvas {
+    max-width: 80%;
+    max-height: 80%;
+  }
+}
+
+.guide-panel {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  max-width: 40%;
+  height: 98%;
+  padding: 0 0 20px 20px;
+  border-radius: 8px 0 0 8px;
+  box-shadow: 2px 2px 10px 1px rgba(145, 145, 145, 0.4);
+  border: solid 1px #DDDDDD;
+  box-sizing: border-box;
+
+  h2 {
+    border-bottom: solid 2px;
+  }
+
+  .content {
+    display: flex;
+    overflow-y: auto;
+    height: 100%;
+    padding-right: 15px;
+  }
+}
+
+p {
+  text-align: justify;
 }

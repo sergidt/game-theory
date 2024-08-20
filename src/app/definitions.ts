@@ -6,25 +6,27 @@
     Hole: Yes -> 1, No -> 0
 */
 
+import { NgtVector3 } from 'angular-three';
+
 export enum Size {
     Small = 0,
     Big = 1
-};
+}
 
 export enum Colour {
     Light = 0,
     Dark = 1
-};
+}
 
 export enum Shape {
     Round = 0,
     Square = 1
-};
+}
 
 export enum Hole {
     No = 0,
     Yes = 1
-};
+}
 
 export const PieceProperties = ['Size', 'Colour', 'Shape', 'Hole'];
 
@@ -47,6 +49,7 @@ export function number2binary(number: number): string {
 export interface Position {
     row: IntRange<0, 4>;
     col: IntRange<0, 4>;
+    position: NgtVector3;
     piece?: Piece;
 }
 
@@ -56,11 +59,6 @@ export type Board = [
     Position, Position, Position, Position,
     Position, Position, Position, Position,
 ];
-
-export enum Turn {
-    User,
-    CPU
-}
 
 export const PIECES = {
     15: 'Big Dark Square Hole', // 1111

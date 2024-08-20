@@ -1,27 +1,23 @@
-import { Board, number2binary, PieceProperties, Position, Turn } from './definitions';
-// Tirar per fer el millor moviment
-// Donar fitxa per a que l'usuari faci el pitjor moviment
+import { Injectable, signal, WritableSignal } from '@angular/core';
+import { Board, number2binary, PieceProperties, Position } from './definitions';
+import { GameState } from './state-machine';
 
+@Injectable({ providedIn: 'root' })
 export class Game {
-    #board!: Board;
-    #turn!: Turn;
-    #winner: Turn | undefined = undefined;
+    #board: Board = [
+        { row: 0, col: 0, position: [57, 0, -57] }, { row: 0, col: 1, position: [57, 0, -19] }, { row: 0, col: 2, position: [57, 0, 19] },
+        { row: 0, col: 3, position: [57, 0, 57] },
+        { row: 1, col: 0, position: [19, 0, -57] }, { row: 1, col: 1, position: [19, 0, -19] }, { row: 1, col: 2, position: [19, 0, 19] },
+        { row: 1, col: 3, position: [19, 0, 57] },
+        { row: 2, col: 0, position: [-19, 0, -57] }, { row: 2, col: 1, position: [-19, 0, -19] }, { row: 2, col: 2, position: [-19, 0, 19] },
+        { row: 2, col: 3, position: [-19, 0, 57] },
+        { row: 3, col: 0, position: [-57, 0, -57] }, { row: 3, col: 1, position: [-57, 0, -19] }, { row: 3, col: 2, position: [-57, 0, 19] },
+        { row: 3, col: 3, position: [-57, 0, 57] },
+    ];
 
-    #moves: Array<Position> = [];
+    #moves: WritableSignal<Position[]> = signal<Position[]>([]);
 
-    constructor(starter: Turn) {
-        this.#turn = starter;
-
-        this.#board = [
-            { row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 0, col: 3 },
-            { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }, { row: 1, col: 3 },
-            { row: 2, col: 0 }, { row: 2, col: 1 }, { row: 2, col: 2 }, { row: 2, col: 3 },
-            { row: 3, col: 0 }, { row: 3, col: 1 }, { row: 3, col: 2 }, { row: 3, col: 3 },
-        ];
-
-        console.log(this);
-        console.log(evaluateBoard(this.#board));
-    }
+    currentState = signal<GameState | undefined>(undefined);
 
     get board() {
         return this.#board;
@@ -32,10 +28,10 @@ export class Game {
     }
 
     undo() {
-        const lastMove = this.#moves.pop();
+        const lastMove = this.#moves().pop();
 
         if (lastMove)
-            this.move({ row: lastMove.row, col: lastMove.col });
+            this.move({ position: lastMove.position, row: lastMove.row, col: lastMove.col });
     }
 }
 
