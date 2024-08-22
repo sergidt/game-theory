@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
     imports: [],
     template: `
       <p>
-        user-piece-selection works! </p>
+        Select the next piece for the opponent, clicking over one of the available pieces </p>
     `,
     styles: ``
 })

@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
     imports: [],
     template: `
       <p>
-        cpu-piece-selection works! </p>
+        The opponent selected this piece for you to place</p>
     `,
     styles: ``
 })

@@ -1,18 +1,16 @@
 export enum GameStates {
     NewGame = 'NewGame',
-    ShufflePieces = 'ShufflePieces',
     UserSelectsPiece = 'UserSelectsPiece',
     UserPlacesPiece = 'UserPlacesPiece',
     CPUSelectsPiece = 'CPUSelectsPiece',
     CPUPlacesPiece = 'CPUPlacesPiece',
-    UserWon = 'UserWon',
-    CPUWon = 'CPUWon',
+    UserWins = 'UserWins',
+    CPUWins = 'CPUWins',
     Draw = 'Draw'
 }
 
 export enum GameActions {
     Ready = 'Ready',
-    PiecesShuffled = 'PiecesShuffled',
     PieceSelected = 'PieceSelected',
     PiecePlaced = 'PiecePlaced',
     WinnerPiece = 'WinnerPiece',
@@ -25,24 +23,21 @@ export type GameAction = keyof typeof GameActions;
 type FromStates = Exclude<GameState, 'UserWon' | 'CPUWon' | 'Draw'>;
 
 export type StateMachine = {
-    [state in FromStates]: {
+    [state in FromStates]?: {
         [action in GameAction]?: GameState;
     }
 }
 
 export const StateMachine: StateMachine = {
     [GameStates.NewGame]: {
-        [GameActions.Ready]: GameStates.ShufflePieces
-    },
-    [GameStates.ShufflePieces]: {
-        [GameActions.PiecesShuffled]: GameStates.UserSelectsPiece
+        [GameActions.Ready]: GameStates.UserSelectsPiece
     },
     [GameStates.UserSelectsPiece]: {
         [GameActions.PieceSelected]: GameStates.CPUPlacesPiece
     },
     [GameStates.CPUPlacesPiece]: {
         [GameActions.PiecePlaced]: GameStates.CPUSelectsPiece,
-        [GameActions.WinnerPiece]: GameStates.CPUWon,
+        [GameActions.WinnerPiece]: GameStates.CPUWins,
         [GameActions.DrawPiece]: GameStates.Draw
     },
     [GameStates.CPUSelectsPiece]: {
@@ -50,13 +45,19 @@ export const StateMachine: StateMachine = {
     },
     [GameStates.UserPlacesPiece]: {
         [GameActions.PiecePlaced]: GameStates.UserSelectsPiece,
-        [GameActions.WinnerPiece]: GameStates.UserWon,
+        [GameActions.WinnerPiece]: GameStates.UserWins,
         [GameActions.DrawPiece]: GameStates.Draw
     }
 };
 
 const getNextState = (currentState: FromStates, action: GameAction) => {
-    const nextState = StateMachine[currentState][action];
+    const currentStateActions = StateMachine[currentState];
+
+    if (!currentStateActions) {
+        throw new Error(`State ${ currentState } is not a valid state`);
+    }
+
+    const nextState = currentStateActions[action];
 
     if (!nextState) {
         throw new Error(`Action ${ action } is not a valid step from state ${ currentState }`);

@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
     imports: [],
     template: `
       <p>
-        user-piece-placing works! </p>
+        Place the given piece over the board </p>
     `,
     styles: ``
 })

@@ -4,7 +4,6 @@ import { GameState } from '../state-machine';
 import { CpuPiecePlacingComponent } from './cpu-piece-placing.component';
 import { CpuPieceSelectionComponent } from './cpu-piece-selection.component';
 import { GameEndComponent } from './game-end.component';
-import { ShufflePiecesComponent } from './shuffle-pieces.component';
 import { UserPiecePlacingComponent } from './user-piece-placing.component';
 import { UserPieceSelectionComponent } from './user-piece-selection.component';
 
@@ -12,7 +11,6 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
     selector: 'new-game',
     standalone: true,
     imports: [
-        ShufflePiecesComponent,
         UserPieceSelectionComponent,
         CpuPieceSelectionComponent,
         UserPiecePlacingComponent,
@@ -25,9 +23,6 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
         @case ('NewGame') {
           <div>New game. Are you ready to start?</div>
           <app-button text="Ready!"/>
-        }
-        @case ('ShufflePieces') {
-          <shuffle-pieces/>
         }
         @case ('UserSelectsPiece') {
           <user-piece-selection/>
@@ -42,7 +37,7 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
           <cpu-piece-placing/>
         }
         @default {
-          <game-end/>
+          <game-end [gameState]="gameState()"/>
         }
       }
     `,
@@ -56,5 +51,4 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
 })
 export class NewGameComponent {
     gameState = input.required<GameState>();
-
 }
