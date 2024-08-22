@@ -1,3 +1,5 @@
+import { NgtVector3 } from 'angular-three';
+
 /*
     Each property describes these characteristics with bits (0, 1):
     Size: Big -> 1, Small -> 0
@@ -25,8 +27,6 @@
     1: 'Small Light Round Hole', // 0001
     0: 'Small Light Round No Hole', // 0000
 */
-
-import { NgtVector3 } from 'angular-three';
 
 export enum Size {
     Small = 0,
