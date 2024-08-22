@@ -1,9 +1,29 @@
 /*
-    Each property describes these properties with bits (0, 1):
+    Each property describes these characteristics with bits (0, 1):
     Size: Big -> 1, Small -> 0
     Colour: Dark -> 1,  -> 0
     Shape: Square -> 1, Round -> 0
     Hole: Yes -> 1, No -> 0
+
+    -----------------------------
+
+    Piece Characteristics:
+    15: 'Big Dark Square Hole', // 1111
+    14: 'Big Dark Square No Hole', // 1110
+    13: 'Big Dark Round Hole', // 1101
+    12: 'Big Dark Round No Hole', // 1100
+    11: 'Big Light Square Hole', // 1011
+    10: 'Big Light Square No Hole',  // 1010
+    9: 'Big Light Round Hole', // 1001
+    8: 'Big Light Round No Hole', // 1000
+    7: 'Small Dark Square Hole', // 0111
+    6: 'Small Dark Square No Hole', // 0110
+    5: 'Small Dark Round Hole', // 0101
+    4: 'Small Dark Round No Hole', // 0100
+    3: 'Small Light Square Hole',// 0011
+    2: 'Small Light Square No Hole', // 0010
+    1: 'Small Light Round Hole', // 0001
+    0: 'Small Light Round No Hole', // 0000
 */
 
 import { NgtVector3 } from 'angular-three';
@@ -35,26 +55,6 @@ type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] exte
     : Enumerate<N, [...Acc, Acc['length']]>
 
 type IntRange<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>;
-
-/*
-Piece Characteristics:
-    15: 'Big Dark Square Hole', // 1111
-    14: 'Big Dark Square No Hole', // 1110
-    13: 'Big Dark Round Hole', // 1101
-    12: 'Big Dark Round No Hole', // 1100
-    11: 'Big Light Square Hole', // 1011
-    10: 'Big Light Square No Hole',  // 1010
-    9: 'Big Light Round Hole', // 1001
-    8: 'Big Light Round No Hole', // 1000
-    7: 'Small Dark Square Hole', // 0111
-    6: 'Small Dark Square No Hole', // 0110
-    5: 'Small Dark Round Hole', // 0101
-    4: 'Small Dark Round No Hole', // 0100
-    3: 'Small Light Square Hole',// 0011
-    2: 'Small Light Square No Hole', // 0010
-    1: 'Small Light Round Hole', // 0001
-    0: 'Small Light Round No Hole', // 0000
- */
 
 export interface Piece {
     path: string;
