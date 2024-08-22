@@ -5,33 +5,8 @@ import { NgtsEnvironment } from 'angular-three-soba/staging';
 import * as THREE from 'three';
 import { Mesh, MeshStandardMaterial, ShapeGeometry, TextureLoader, TorusGeometry } from 'three';
 import { GLTFLoader } from 'three-stdlib';
+import { PIECES } from './definitions';
 import { GamePieceComponent } from './game-piece.component';
-
-export interface PieceDefinition {
-    path: string;
-    initialPosition: NgtVector3;
-}
-
-const PIECES: PieceDefinition[] = [
-    { path: '/assets/round-big-hole.glb', initialPosition: [80, -12, -130] },
-    { path: '/assets/round-big-no-hole.glb', initialPosition: [50, -12, -130] },
-    { path: '/assets/square-big-hole.glb', initialPosition: [20, -12, -130] },
-    { path: '/assets/square-big-no-hole.glb', initialPosition: [-10, -12, -130] },
-    { path: '/assets/round-small-hole.glb', initialPosition: [80, -12, -160] },
-    { path: '/assets/round-small-no-hole.glb', initialPosition: [50, -12, -160] },
-    { path: '/assets/square-small-hole.glb', initialPosition: [20, -12, -160] },
-    { path: '/assets/square-small-no-hole.glb', initialPosition: [-10, -12, -160] },
-    //
-    { path: '/assets/round-big-hole.glb', initialPosition: [-40, -12, -130] },
-    { path: '/assets/round-big-no-hole.glb', initialPosition: [-70, -12, -130] },
-    { path: '/assets/square-big-hole.glb', initialPosition: [-100, -12, -130] },
-    { path: '/assets/square-big-no-hole.glb', initialPosition: [-130, -12, -130] },
-    { path: '/assets/round-small-hole.glb', initialPosition: [-40, -12, -160] },
-    { path: '/assets/round-small-no-hole.glb', initialPosition: [-70, -12, -160] },
-    { path: '/assets/square-small-hole.glb', initialPosition: [-100, -12, -160] },
-    { path: '/assets/square-small-no-hole.glb', initialPosition: [-130, -12, -160] }
-
-];
 
 extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry });
 
@@ -47,11 +22,8 @@ extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry });
                        *args="[board()?.scene]"/>
 
         <ngt-group>
-          @for (piece of pieces; track $index; let i = $index) {
-            <game-piece [url]="piece.path"
-                        [index]="i"
-                        [color]="i < 8 ? 'red' : 'white'"
-                        [options]="{position: piece.initialPosition}"/>
+          @for (piece of pieces; track $index) {
+            <game-piece [piece]="piece"/>
 
           }
         </ngt-group>

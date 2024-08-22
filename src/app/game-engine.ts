@@ -30,8 +30,10 @@ export class Game {
     undo() {
         const lastMove = this.#moves().pop();
 
-        if (lastMove)
+        if (lastMove) {
             this.move({ position: lastMove.position, row: lastMove.row, col: lastMove.col });
+            lastMove.piece!;
+        }
     }
 }
 
@@ -106,10 +108,9 @@ function evaluatePositions(positions: Position[]) {
 
     //console.log('Evaluating:\n', filledPositions.map(p => PIECES[p.piece!]).join('\n'));
 
-    const value = filledPositions.reduce((acc, cur) => acc & cur.piece!, filledPositions.length ? 15 : 0);
+    const value = filledPositions.reduce((acc, cur) => acc & cur.piece?.characteristics!, filledPositions.length ? 15 : 0);
 
     const commonFeatures = number2binary(value)
-        .padStart(4, '0')
         .split('')
         .reduce((acc: string[], cur, currentIndex) => cur === '1' ? [...acc, PieceProperties[currentIndex]] : acc, []);
     // console.log('Common features:', commonFeatures);

@@ -36,31 +36,8 @@ type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] exte
 
 type IntRange<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>;
 
-export type Piece = IntRange<0, 16>;
-
-export function getPiece(size: Size, colour: Colour, shape: Shape, hole: Hole): number {
-    return parseInt(`${ size }${ colour }${ shape }${ hole }`, 2);
-}
-
-export function number2binary(number: number): string {
-    return (number >>> 0).toString(2);
-}
-
-export interface Position {
-    row: IntRange<0, 4>;
-    col: IntRange<0, 4>;
-    position: NgtVector3;
-    piece?: Piece;
-}
-
-export type Board = [
-    Position, Position, Position, Position,
-    Position, Position, Position, Position,
-    Position, Position, Position, Position,
-    Position, Position, Position, Position,
-];
-
-export const PIECES = {
+/*
+Piece Characteristics:
     15: 'Big Dark Square Hole', // 1111
     14: 'Big Dark Square No Hole', // 1110
     13: 'Big Dark Round Hole', // 1101
@@ -77,4 +54,123 @@ export const PIECES = {
     2: 'Small Light Square No Hole', // 0010
     1: 'Small Light Round Hole', // 0001
     0: 'Small Light Round No Hole', // 0000
+ */
+
+export interface Piece {
+    path: string;
+    position: NgtVector3;
+    placed: boolean;
+    characteristics: IntRange<0, 16>;
+}
+
+export const PIECES: Piece[] = [
+    {
+        path: '/assets/round-big-hole.glb?dark=yes', position: [80, -12, -130], placed: false,
+        characteristics: getPiece(Size.Big, Colour.Dark, Shape.Round, Hole.Yes)
+    },
+    {
+        path: '/assets/round-big-hole.glb?dark=no', position: [50, -12, -130], placed: false,
+        characteristics: getPiece(Size.Big, Colour.Light, Shape.Round, Hole.Yes)
+    },
+    {
+        path: '/assets/round-big-no-hole.glb?dark=yes', position: [20, -12, -130], placed: false,
+        characteristics: getPiece(Size.Big, Colour.Dark, Shape.Round, Hole.No)
+    },
+    {
+        path: '/assets/round-big-no-hole.glb?dark=no', position: [-10, -12, -130], placed: false,
+        characteristics: getPiece(Size.Big, Colour.Light, Shape.Round, Hole.No)
+    },
+    {
+        path: '/assets/square-big-hole.glb?dark=yes', position: [-40, -12, -130], placed: false,
+        characteristics: getPiece(Size.Big, Colour.Dark, Shape.Square, Hole.Yes)
+    },
+    {
+        path: '/assets/square-big-hole.glb?dark=no', position: [-70, -12, -130], placed: false,
+        characteristics: getPiece(Size.Big, Colour.Light, Shape.Square, Hole.Yes)
+    },
+    {
+        path: '/assets/square-big-no-hole.glb?dark=yes', position: [-100, -12, -130], placed: false,
+        characteristics: getPiece(Size.Big, Colour.Dark, Shape.Square, Hole.No)
+    },
+    {
+        path: '/assets/square-big-no-hole.glb?dark=no', position: [-130, -12, -130], placed: false,
+        characteristics: getPiece(Size.Big, Colour.Light, Shape.Square, Hole.No)
+    },
+    {
+        path: '/assets/round-small-hole.glb?dark=yes', position: [80, -12, -160], placed: false,
+        characteristics: getPiece(Size.Small, Colour.Dark, Shape.Round, Hole.Yes)
+    },
+    {
+        path: '/assets/round-small-hole.glb?dark=no', position: [50, -12, -160], placed: false,
+        characteristics: getPiece(Size.Small, Colour.Light, Shape.Round, Hole.Yes)
+    },
+    {
+        path: '/assets/round-small-no-hole.glb?dark=yes', position: [20, -12, -160], placed: false,
+        characteristics: getPiece(Size.Small, Colour.Dark, Shape.Round, Hole.No)
+    },
+    {
+        path: '/assets/round-small-no-hole.glb?dark=no', position: [-10, -12, -160], placed: false,
+        characteristics: getPiece(Size.Small, Colour.Light, Shape.Round, Hole.Yes)
+    },
+    {
+        path: '/assets/square-small-hole.glb?dark=yes', position: [-40, -12, -160], placed: false,
+        characteristics: getPiece(Size.Small, Colour.Dark, Shape.Square, Hole.Yes)
+    },
+    {
+        path: '/assets/square-small-hole.glb?dark=no', position: [-70, -12, -160], placed: false,
+        characteristics: getPiece(Size.Small, Colour.Light, Shape.Square, Hole.No)
+    },
+    {
+        path: '/assets/square-small-no-hole.glb?dark=yes', position: [-100, -12, -160], placed: false,
+        characteristics: getPiece(Size.Small, Colour.Dark, Shape.Square, Hole.No)
+    },
+    {
+        path: '/assets/square-small-no-hole.glb?dark=no', position: [-130, -12, -160], placed: false,
+        characteristics: getPiece(Size.Small, Colour.Light, Shape.Square, Hole.No)
+    },
+];
+
+export function getPiece(size: Size, colour: Colour, shape: Shape, hole: Hole): IntRange<0, 16> {
+    const value = parseInt(`${ size }${ colour }${ shape }${ hole }`, 2);
+
+    if (value < 0 || value > 16) {
+        throw new Error('Invalid piece characteristics');
+    }
+
+    return value as IntRange<0, 16>;
+}
+
+export function number2binary(number: number): string {
+    return (number >>> 0).toString(2).padStart(4, '0');
+}
+
+export const CharacteristicIndices = {
+    Size: 0,
+    Colour: 1,
+    Shape: 2,
+    Hole: 3
 };
+
+export function getSingleCharacteristic(piece: Piece, characteristic: 'Size' | 'Colour' | 'Shape' | 'Hole'): 0 | 1 {
+    const characteristicValue = Number(number2binary(piece.characteristics).at(CharacteristicIndices[characteristic])!);
+    if (characteristicValue !== 0 && characteristicValue !== 1) {
+        throw new Error('Invalid characteristic');
+    }
+    return characteristicValue as 0 | 1;
+}
+
+export interface Position {
+    row: IntRange<0, 4>;
+    col: IntRange<0, 4>;
+    position: NgtVector3;
+    piece?: Piece;
+}
+
+export type Board = [
+    Position, Position, Position, Position,
+    Position, Position, Position, Position,
+    Position, Position, Position, Position,
+    Position, Position, Position, Position,
+];
+
+
