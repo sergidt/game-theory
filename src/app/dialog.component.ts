@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, output } from '@angular/core';
 import { AppButtonComponent } from './button.component';
 
 @Component({
@@ -9,9 +9,9 @@ import { AppButtonComponent } from './button.component';
     ],
     template: `
       <div class="dialog">
-        <h2>{{ title() }}</h2>
-        <p>lasdhfkladsfh</p>
-        <app-button text=" ahldhf "/>
+        <ng-content/>
+        <app-button text="Close"
+                    (click)="close.emit()"/>
       </div>
     `,
     styles: `
@@ -27,12 +27,16 @@ import { AppButtonComponent } from './button.component';
       }
 
       .dialog {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
         font-weight: 600;
         color: #382b22;
-        padding: 0 1em;
-        background: #fff0f0;
+        padding: 0 1em 2em 1em;
+        background: #ffffff;
         border: 2px solid #b18597;
         border-radius: 0.75em;
+        max-width: 800px;
 
         h2 {
           margin-block-start: 4px;
@@ -41,5 +45,5 @@ import { AppButtonComponent } from './button.component';
     `
 })
 export class GameDialogComponent {
-    title = input('Dialog title');
+    close = output();
 }

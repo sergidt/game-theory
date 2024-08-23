@@ -21,7 +21,7 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
     template: `
       @switch (gameState()) {
         @case ('NewGame') {
-          <div>New game. Are you ready to start?</div>
+          <div>Are you ready to start a new game?</div>
           <app-button text="Ready!"/>
         }
         @case ('UserSelectsPiece') {

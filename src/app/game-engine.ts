@@ -3,7 +3,7 @@ import { Board, number2binary, PieceProperties, Position } from './definitions';
 import { GameState, GameStates } from './state-machine';
 
 @Injectable({ providedIn: 'root' })
-export class Game {
+export class GameEngine {
     #board: Board = [
         { row: 0, col: 0, position: [57, 0, -57] }, { row: 0, col: 1, position: [57, 0, -19] }, { row: 0, col: 2, position: [57, 0, 19] },
         { row: 0, col: 3, position: [57, 0, 57] },
@@ -42,7 +42,7 @@ function getPossibleMoves(board: Board): Array<Position> {
 }
 
 export function getNextMove(depth: number = 3,
-    game: Game,
+    game: GameEngine,
     alpha = Number.NEGATIVE_INFINITY,
     beta = Number.POSITIVE_INFINITY,
     isMaximizingPlayer = true): number {

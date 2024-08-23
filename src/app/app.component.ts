@@ -5,7 +5,7 @@ import { Board } from './board.component';
 import { AppButtonComponent } from './button.component';
 import { GameDialogComponent } from './dialog.component';
 import { GameDescriptionComponent } from './game-description.component';
-import { Game } from './game-engine';
+import { GameEngine } from './game-engine';
 import { NewGameComponent } from './new-game/new-game.component';
 
 export enum GameOptions {
@@ -18,17 +18,16 @@ export enum GameOptions {
     standalone: true,
     imports: [NgtCanvas, AppButtonComponent, GameDialogComponent, GameDescriptionComponent, RouterOutlet, NewGameComponent],
     template: `
-      <!--game-dialog/-->
-
-      <div class="title">
-        <h1>Quarto</h1>
+      @if (showInstructions()) {
+        <game-dialog (close)="showInstructions.set(false)">
+          <game-description/>
+        </game-dialog>
+      }
+      <div class="top-bar">
+        <div class="title">Quarto</div>
         <app-button [text]="GameOptions.HowToPlay"
-                    [selected]="viewState() === GameOptions.HowToPlay"
-                    (click)="viewState.set(GameOptions.HowToPlay)"/>
-
-        <app-button [text]="GameOptions.NewGame"
-                    [selected]="viewState() === GameOptions.NewGame"
-                    (click)="viewState.set(GameOptions.NewGame)"/>
+                    [style.margin-top.px]="15"
+                    (click)="showInstructions.set(true)"/>
       </div>
 
       <div class="main-content">
@@ -41,13 +40,7 @@ export enum GameOptions {
           <h2>Quarto game</h2>
 
           <div class="content">
-
-            @if (viewState() === GameOptions.HowToPlay) {
-              <game-description/>
-            } @else {
-              <new-game [gameState]="game.currentState()"/>
-            }
-
+            <new-game [gameState]="game.currentState()"/>
           </div>
         </div>
       </div>
@@ -64,7 +57,9 @@ export enum GameOptions {
 export class AppComponent {
     protected sceneGraph = Board;
     protected viewState = signal<GameOptions>(GameOptions.NewGame);
-    protected game = inject(Game);
+    protected game = inject(GameEngine);
 
     GameOptions = GameOptions;
+
+    showInstructions = signal(false);
 }
