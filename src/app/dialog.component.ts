@@ -1,17 +1,14 @@
 import { Component, output } from '@angular/core';
-import { AppButtonComponent } from './button.component';
 
 @Component({
     selector: 'game-dialog',
     standalone: true,
-    imports: [
-        AppButtonComponent
-    ],
     template: `
       <div class="dialog">
         <ng-content/>
-        <app-button text="Close"
-                    (click)="close.emit()"/>
+        <button (click)="close.emit()">
+          Close
+        </button>
       </div>
     `,
     styles: `

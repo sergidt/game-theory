@@ -1,6 +1,6 @@
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, input, Signal } from '@angular/core';
-import { createAttachFunction, extend, injectLoader, NgtArgs } from 'angular-three';
-import { BufferGeometry, Color, Mesh, MeshStandardMaterial } from 'three';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, input, signal, Signal } from '@angular/core';
+import { extend, injectLoader, NgtArgs } from 'angular-three';
+import { Mesh, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
 import { getSingleCharacteristic, Piece } from './definitions';
 
@@ -16,7 +16,7 @@ type GLTFResult = GLTF & {
 const DarkColor = '#1d3557';
 const LightColor = '#eacdc2';
 
-extend({ Mesh, Color });
+extend({ Mesh, MeshStandardMaterial });
 
 @Component({
     selector: 'game-piece',
@@ -28,9 +28,9 @@ extend({ Mesh, Color });
                     [castShadow]="true"
                     [receiveShadow]="true"
                     [geometry]="gltf.nodes.imagetostl_mesh0.geometry"
-                    [material]="gltf.materials.mat0">
-            <ngt-color *args="[]"
-                       [attach]="attachColor"/>
+                    (pointerover)="highlighted.set(true)"
+                    (pointerout)="highlighted.set(false)">
+            <ngt-mesh-standard-material [color]="highlighted() ? '#ff9e42' : color()"/>
           </ngt-mesh>
         </ngt-group>
       }
@@ -39,17 +39,11 @@ extend({ Mesh, Color });
     imports: [NgtArgs],
 })
 export class GamePieceComponent {
-    piece = input.required<Piece>();
-
-    position = computed(() => ({ position: this.piece().position }));
     gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
 
-    attachColor = createAttachFunction<Color, Mesh>(({ parent, child }) => {
-        const mesh = parent as Mesh<BufferGeometry, MeshStandardMaterial>;
-        const oldColor = mesh.material['color'];
-        const color = getSingleCharacteristic(this.piece(), 'Colour');
-        console.log('piece', this.piece(), 'color', color, [LightColor, DarkColor][color]);
-        mesh.material.color.set([LightColor, DarkColor][color]);
-        return () => mesh.material.color.set(oldColor);
-    });
+    piece = input.required<Piece>();
+
+    protected highlighted = signal(false);
+    protected position = computed(() => ({ position: this.piece().position }));
+    protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
 }

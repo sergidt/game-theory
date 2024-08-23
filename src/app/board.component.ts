@@ -3,7 +3,7 @@ import { extend, injectLoader, NgtArgs, NgtGroup, NgtSelection, NgtVector3 } fro
 import { NgtsCameraControls, NgtsOrbitControls } from 'angular-three-soba/controls';
 import { NgtsEnvironment } from 'angular-three-soba/staging';
 import * as THREE from 'three';
-import { Mesh, MeshStandardMaterial, ShapeGeometry, TextureLoader, TorusGeometry } from 'three';
+import { Mesh, MeshStandardMaterial, ShapeGeometry, TorusGeometry } from 'three';
 import { GLTFLoader } from 'three-stdlib';
 import { PIECES } from './definitions';
 import { GamePieceComponent } from './game-piece.component';
@@ -14,8 +14,6 @@ extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry });
     selector: 'board',
     standalone: true,
     template: `
-
-
       <ngt-group #group
                  [parameters]="{scale: 0.020, rotation: [-0.1, Math.PI, 1.2]}">
         <ngt-primitive #board
@@ -24,7 +22,6 @@ extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry });
         <ngt-group>
           @for (piece of pieces; track $index) {
             <game-piece [piece]="piece"/>
-
           }
         </ngt-group>
 
@@ -56,8 +53,6 @@ export class Board {
     torusIndexHovered = signal(-1);
 
     torusGeometryArgs = [17, 1.8, 100, 100];
-
-    texture = injectLoader(() => TextureLoader, () => '/assets/wood.jpg');
 
     board = injectLoader(
         () => GLTFLoader, () => '/assets/board.glb',

@@ -1,9 +1,7 @@
-import { Component, input } from '@angular/core';
-import { AppButtonComponent } from '../button.component';
-import { GameState } from '../state-machine';
+import { Component, inject } from '@angular/core';
+import { GameActions, GameStateMachine } from '../game-state-machine';
 import { CpuPiecePlacingComponent } from './cpu-piece-placing.component';
 import { CpuPieceSelectionComponent } from './cpu-piece-selection.component';
-import { GameEndComponent } from './game-end.component';
 import { UserPiecePlacingComponent } from './user-piece-placing.component';
 import { UserPieceSelectionComponent } from './user-piece-selection.component';
 
@@ -15,14 +13,14 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
         CpuPieceSelectionComponent,
         UserPiecePlacingComponent,
         CpuPiecePlacingComponent,
-        GameEndComponent,
-        AppButtonComponent
     ],
     template: `
-      @switch (gameState()) {
+      <h2>Quarto game</h2>
+      
+      @switch (gameStateMachine.currentState()) {
         @case ('NewGame') {
           <div>Are you ready to start a new game?</div>
-          <app-button text="Ready!"/>
+          <button (click)="gameStateMachine.getNextState(GameActions.Ready)">Ready!</button>
         }
         @case ('UserSelectsPiece') {
           <user-piece-selection/>
@@ -36,8 +34,14 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
         @case ('CPUSelectsPiece') {
           <cpu-piece-placing/>
         }
+        @case ('UserWins') {
+          <div>Congratulations! You win!</div>
+        }
+        @case ('CPUWins') {
+          <div>Sorry! You lose!</div>
+        }
         @default {
-          <game-end [gameState]="gameState()"/>
+          <div>It's a draw!</div>
         }
       }
     `,
@@ -50,5 +54,6 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
     `
 })
 export class NewGameComponent {
-    gameState = input.required<GameState>();
+    protected readonly gameStateMachine = inject(GameStateMachine);
+    protected readonly GameActions = GameActions;
 }

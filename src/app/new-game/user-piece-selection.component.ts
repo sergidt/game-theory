@@ -5,10 +5,10 @@ import { Component } from '@angular/core';
     standalone: true,
     imports: [],
     template: `
-      <p>
-        Select the next piece for the opponent, clicking over one of the available pieces </p>
+      <h4>User choosing next opponent piece</h4><p>
+        Select the next piece for the opponent,
+        clicking over one of the available pieces </p>
     `,
-    styles: ``
 })
 export class UserPieceSelectionComponent {
 

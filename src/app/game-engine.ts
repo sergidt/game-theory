@@ -1,23 +1,28 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { Board, number2binary, PieceProperties, Position } from './definitions';
-import { GameState, GameStates } from './state-machine';
 
 @Injectable({ providedIn: 'root' })
 export class GameEngine {
     #board: Board = [
-        { row: 0, col: 0, position: [57, 0, -57] }, { row: 0, col: 1, position: [57, 0, -19] }, { row: 0, col: 2, position: [57, 0, 19] },
+        { row: 0, col: 0, position: [57, 0, -57] },
+        { row: 0, col: 1, position: [57, 0, -19] },
+        { row: 0, col: 2, position: [57, 0, 19] },
         { row: 0, col: 3, position: [57, 0, 57] },
-        { row: 1, col: 0, position: [19, 0, -57] }, { row: 1, col: 1, position: [19, 0, -19] }, { row: 1, col: 2, position: [19, 0, 19] },
+        { row: 1, col: 0, position: [19, 0, -57] },
+        { row: 1, col: 1, position: [19, 0, -19] },
+        { row: 1, col: 2, position: [19, 0, 19] },
         { row: 1, col: 3, position: [19, 0, 57] },
-        { row: 2, col: 0, position: [-19, 0, -57] }, { row: 2, col: 1, position: [-19, 0, -19] }, { row: 2, col: 2, position: [-19, 0, 19] },
+        { row: 2, col: 0, position: [-19, 0, -57] },
+        { row: 2, col: 1, position: [-19, 0, -19] },
+        { row: 2, col: 2, position: [-19, 0, 19] },
         { row: 2, col: 3, position: [-19, 0, 57] },
-        { row: 3, col: 0, position: [-57, 0, -57] }, { row: 3, col: 1, position: [-57, 0, -19] }, { row: 3, col: 2, position: [-57, 0, 19] },
+        { row: 3, col: 0, position: [-57, 0, -57] },
+        { row: 3, col: 1, position: [-57, 0, -19] },
+        { row: 3, col: 2, position: [-57, 0, 19] },
         { row: 3, col: 3, position: [-57, 0, 57] },
     ];
 
     #moves: WritableSignal<Position[]> = signal<Position[]>([]);
-
-    currentState = signal<GameState>(GameStates.NewGame);
 
     get board() {
         return this.#board;
