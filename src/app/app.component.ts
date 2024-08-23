@@ -33,8 +33,7 @@ import { GameGuideComponent } from './new-game/game-guide.component';
       <div class="main-content">
         <ngt-canvas #canvas
                     [sceneGraph]="sceneGraph"
-                    [camera]="{position: [8,-6,6], fov: 45}"
-                    [shadows]="true"/>
+                    [camera]="{position: [8,-6,6], fov: 90}"/>
 
         <div class="guide-panel">
           <new-game/>

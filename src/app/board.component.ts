@@ -3,19 +3,20 @@ import { extend, injectLoader, NgtArgs, NgtGroup, NgtSelection, NgtVector3 } fro
 import { NgtsCameraControls, NgtsOrbitControls } from 'angular-three-soba/controls';
 import { NgtsEnvironment } from 'angular-three-soba/staging';
 import * as THREE from 'three';
-import { Mesh, MeshStandardMaterial, ShapeGeometry, TorusGeometry } from 'three';
+import { AmbientLight, Mesh, MeshStandardMaterial, ShapeGeometry, TorusGeometry } from 'three';
 import { GLTFLoader } from 'three-stdlib';
 import { PIECES } from './definitions';
 import { GamePieceComponent } from './game-piece.component';
 
-extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry });
+extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry, AmbientLight });
 
 @Component({
     selector: 'board',
     standalone: true,
     template: `
+      <ngt-ambient-light [intensity]="1"/>
       <ngt-group #group
-                 [parameters]="{scale: 0.020, rotation: [Math.PI / 4, Math.PI  , Math.PI / 6]}">
+                 [parameters]="{scale: 0.020, rotation: [Math.PI / 2, Math.PI  , Math.PI / 4]}">
         <ngt-primitive #board
                        *args="[board()?.scene]"/>
 

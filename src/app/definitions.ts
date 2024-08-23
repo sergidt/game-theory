@@ -66,97 +66,97 @@ export interface Piece {
 export const PIECES: Piece[] = [
     {
         path: '/assets/round-big-hole.glb?dark=yes',
-        position: [80, -12, -130],
+        position: [57, -12, -130],
         placed: false,
         characteristics: getPiece(Size.Big, Colour.Dark, Shape.Round, Hole.Yes)
     },
     {
         path: '/assets/round-big-hole.glb?dark=no',
-        position: [50, -12, -130],
+        position: [19, -12, -130],
         placed: false,
         characteristics: getPiece(Size.Big, Colour.Light, Shape.Round, Hole.Yes)
     },
     {
         path: '/assets/round-big-no-hole.glb?dark=yes',
-        position: [20, -12, -130],
+        position: [-19, -12, -130],
         placed: false,
         characteristics: getPiece(Size.Big, Colour.Dark, Shape.Round, Hole.No)
     },
     {
         path: '/assets/round-big-no-hole.glb?dark=no',
-        position: [-10, -12, -130],
+        position: [-57, -12, -130],
         placed: false,
         characteristics: getPiece(Size.Big, Colour.Light, Shape.Round, Hole.No)
     },
     {
         path: '/assets/square-big-hole.glb?dark=yes',
-        position: [-40, -12, -130],
+        position: [57, -12, 130],
         placed: false,
         characteristics: getPiece(Size.Big, Colour.Dark, Shape.Square, Hole.Yes)
     },
     {
         path: '/assets/square-big-hole.glb?dark=no',
-        position: [-70, -12, -130],
+        position: [19, -12, 130],
         placed: false,
         characteristics: getPiece(Size.Big, Colour.Light, Shape.Square, Hole.Yes)
     },
     {
         path: '/assets/square-big-no-hole.glb?dark=yes',
-        position: [-100, -12, -130],
+        position: [-19, -12, 130],
         placed: false,
         characteristics: getPiece(Size.Big, Colour.Dark, Shape.Square, Hole.No)
     },
     {
         path: '/assets/square-big-no-hole.glb?dark=no',
-        position: [-130, -12, -130],
+        position: [-57, -12, 130],
         placed: false,
         characteristics: getPiece(Size.Big, Colour.Light, Shape.Square, Hole.No)
     },
     {
         path: '/assets/round-small-hole.glb?dark=yes',
-        position: [80, -12, -160],
+        position: [130, -12, 57],
         placed: false,
         characteristics: getPiece(Size.Small, Colour.Dark, Shape.Round, Hole.Yes)
     },
     {
         path: '/assets/round-small-hole.glb?dark=no',
-        position: [50, -12, -160],
+        position: [130, -12, 19],
         placed: false,
-        characteristics: getPiece(Size.Small, Colour.Light, Shape.Round, Hole.Yes)
+        characteristics: getPiece(Size.Small, Colour.Light, Shape.Round, Hole.No)
     },
     {
         path: '/assets/round-small-no-hole.glb?dark=yes',
-        position: [20, -12, -160],
+        position: [130, -12, -19],
         placed: false,
         characteristics: getPiece(Size.Small, Colour.Dark, Shape.Round, Hole.No)
     },
     {
         path: '/assets/round-small-no-hole.glb?dark=no',
-        position: [-10, -12, -160],
+        position: [130, -12, -57],
         placed: false,
         characteristics: getPiece(Size.Small, Colour.Light, Shape.Round, Hole.Yes)
     },
     {
         path: '/assets/square-small-hole.glb?dark=yes',
-        position: [-40, -12, -160],
+        position: [-130, -12, 57],
         placed: false,
         characteristics: getPiece(Size.Small, Colour.Dark, Shape.Square, Hole.Yes)
     },
     {
         path: '/assets/square-small-hole.glb?dark=no',
-        position: [-70, -12, -160],
+        position: [-130, -12, 19],
         placed: false,
-        characteristics: getPiece(Size.Small, Colour.Light, Shape.Square, Hole.No)
+        characteristics: getPiece(Size.Small, Colour.Light, Shape.Square, Hole.Yes)
     },
     {
         path: '/assets/square-small-no-hole.glb?dark=yes',
-        position: [-100, -12, -160],
+        position: [-130, -12, -19],
         placed: false,
         characteristics: getPiece(Size.Small, Colour.Dark, Shape.Square, Hole.No)
     },
     {
         path: '/assets/square-small-no-hole.glb?dark=no',
-        position: [-130, -12, -160],
+        position: [-130, -12, -57],
         placed: false,
         characteristics: getPiece(Size.Small, Colour.Light, Shape.Square, Hole.No)
     },

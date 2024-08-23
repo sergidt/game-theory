@@ -1,9 +1,6 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { Board, number2binary, PieceProperties, Position } from './definitions';
 
-class IntRange<T, U> {
-}
-
 @Injectable({ providedIn: 'root' })
 export class GameEngine {
     #board: Board = [
