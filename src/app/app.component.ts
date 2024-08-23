@@ -4,7 +4,7 @@ import { NgtCanvas } from 'angular-three';
 import { Board } from './board.component';
 import { GameDialogComponent } from './dialog.component';
 import { GameDescriptionComponent } from './game-description.component';
-import { NewGameComponent } from './new-game/new-game.component';
+import { GameGuideComponent } from './new-game/game-guide.component';
 
 @Component({
     selector: 'app-root',
@@ -14,7 +14,7 @@ import { NewGameComponent } from './new-game/new-game.component';
         GameDialogComponent,
         GameDescriptionComponent,
         RouterOutlet,
-        NewGameComponent
+        GameGuideComponent
     ],
     template: `
       @if (showInstructions()) {
@@ -33,7 +33,7 @@ import { NewGameComponent } from './new-game/new-game.component';
       <div class="main-content">
         <ngt-canvas #canvas
                     [sceneGraph]="sceneGraph"
-                    [camera]="{position: [8,0,0], fov: 80}"
+                    [camera]="{position: [8,-6,6], fov: 45}"
                     [shadows]="true"/>
 
         <div class="guide-panel">

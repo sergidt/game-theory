@@ -15,7 +15,7 @@ extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry });
     standalone: true,
     template: `
       <ngt-group #group
-                 [parameters]="{scale: 0.020, rotation: [-0.1, Math.PI, 1.2]}">
+                 [parameters]="{scale: 0.020, rotation: [Math.PI / 4, Math.PI  , Math.PI / 6]}">
         <ngt-primitive #board
                        *args="[board()?.scene]"/>
 

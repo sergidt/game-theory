@@ -29,7 +29,7 @@ import { Component, output } from '@angular/core';
         align-items: flex-end;
         font-weight: 600;
         color: #382b22;
-        padding: 0 1em 2em 1em;
+        padding: 0 2em 2em 2em;
         background: #ffffff;
         border: 2px solid #b18597;
         border-radius: 0.75em;

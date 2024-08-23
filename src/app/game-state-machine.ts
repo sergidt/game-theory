@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
+import { IntRange } from './definitions';
 
 export enum GameStates {
     NewGame = 'NewGame',
@@ -32,6 +33,10 @@ export type GameStateTransitions = {
 @Injectable({ providedIn: 'root' })
 export class GameStateMachine {
     currentState = signal<GameState>(GameStates.NewGame);
+
+    playing = computed(() => !['NewGame', 'Draw', 'CPUWins', 'UserWins'].includes(this.currentState()));
+
+    selectedPiece = signal<IntRange<0, 16> | null>(null);
 
     #allowedTransitions: GameStateTransitions = {
         [GameStates.NewGame]: {
@@ -78,5 +83,9 @@ export class GameStateMachine {
             throw new Error(`Action ${ action } is not a valid step from current state:  ${ this.currentState() }`);
 
         this.currentState.set(nextState);
+    }
+
+    toggleSelection(characteristics: IntRange<0, 16>) {
+        this.selectedPiece.set(this.selectedPiece() === characteristics ? null : characteristics);
     }
 }

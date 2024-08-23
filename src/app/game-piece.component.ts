@@ -1,8 +1,9 @@
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, input, signal, Signal } from '@angular/core';
-import { extend, injectLoader, NgtArgs } from 'angular-three';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject, input, signal, Signal } from '@angular/core';
+import { extend, injectLoader, NgtArgs, NgtThreeEvent } from 'angular-three';
 import { Mesh, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
 import { getSingleCharacteristic, Piece } from './definitions';
+import { GameStateMachine } from './game-state-machine';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -28,9 +29,10 @@ extend({ Mesh, MeshStandardMaterial });
                     [castShadow]="true"
                     [receiveShadow]="true"
                     [geometry]="gltf.nodes.imagetostl_mesh0.geometry"
-                    (pointerover)="selected.set(true)"
-                    (pointerout)="selected.set(false)">
-            <ngt-mesh-standard-material [color]="selected() ? '#ff9e42' : color()"/>
+                    (click)="clicked($event)"
+                    (pointerover)="pointerOver($event)"
+                    (pointerout)="pointerOut($event)">
+            <ngt-mesh-standard-material [color]="selected() ? 'red' : highlighted() ? '#ff9e42' : color()"/>
           </ngt-mesh>
         </ngt-group>
       }
@@ -39,11 +41,37 @@ extend({ Mesh, MeshStandardMaterial });
     imports: [NgtArgs],
 })
 export class GamePieceComponent {
-    gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
-
     piece = input.required<Piece>();
 
-    protected selected = signal(false);
+    protected gameStateMachine = inject(GameStateMachine);
+
+    protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
+
+    protected highlighted = signal(false);
+
+    protected selected = computed(() => this.piece().characteristics === this.gameStateMachine.selectedPiece());
     protected position = computed(() => ({ position: this.piece().position }));
     protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
+    protected readonly console = console;
+
+    pointerOver(event: NgtThreeEvent<PointerEvent>) {
+        if (this.gameStateMachine.playing()) {
+            event.stopPropagation();
+            this.highlighted.set(true);
+        }
+    }
+
+    pointerOut(event: NgtThreeEvent<PointerEvent>) {
+        if (this.gameStateMachine.playing()) {
+            event.stopPropagation();
+            this.highlighted.set(false);
+        }
+    }
+
+    clicked(event: NgtThreeEvent<MouseEvent>) {
+        if (this.gameStateMachine.playing()) {
+            event.stopPropagation();
+            this.gameStateMachine.toggleSelection(this.piece().characteristics);
+        }
+    }
 }

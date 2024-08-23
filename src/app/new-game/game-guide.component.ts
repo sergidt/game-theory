@@ -15,8 +15,10 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
         CpuPiecePlacingComponent,
     ],
     template: `
-      <h2>Quarto game</h2>
-      
+      <h2>Game guide</h2>
+
+      <span>(playing? {{ gameStateMachine.playing() }})</span>
+
       @switch (gameStateMachine.currentState()) {
         @case ('NewGame') {
           <div>Are you ready to start a new game?</div>
@@ -53,7 +55,7 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
       }
     `
 })
-export class NewGameComponent {
+export class GameGuideComponent {
     protected readonly gameStateMachine = inject(GameStateMachine);
     protected readonly GameActions = GameActions;
 }
