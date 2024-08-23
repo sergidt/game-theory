@@ -71,13 +71,14 @@ p {
 
 
 button {
+  max-width: 300px;
   display: inline-block;
   cursor: pointer;
   font-size: inherit;
   font-family: inherit;
   font-weight: 600;
   color: #382b22;
-  padding: 0 1.5em;
+  padding: 0.3em 1.5em;
   background: #fff0f0;
   border: 2px solid #b18597;
   border-radius: 0.75em;
@@ -87,8 +88,6 @@ button {
   &::before {
     position: absolute;
     content: '';
-    width: 100%;
-    height: 100%;
     top: 0;
     left: 0;
     right: 0;

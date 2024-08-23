@@ -28,9 +28,9 @@ extend({ Mesh, MeshStandardMaterial });
                     [castShadow]="true"
                     [receiveShadow]="true"
                     [geometry]="gltf.nodes.imagetostl_mesh0.geometry"
-                    (pointerover)="highlighted.set(true)"
-                    (pointerout)="highlighted.set(false)">
-            <ngt-mesh-standard-material [color]="highlighted() ? '#ff9e42' : color()"/>
+                    (pointerover)="selected.set(true)"
+                    (pointerout)="selected.set(false)">
+            <ngt-mesh-standard-material [color]="selected() ? '#ff9e42' : color()"/>
           </ngt-mesh>
         </ngt-group>
       }
@@ -43,7 +43,7 @@ export class GamePieceComponent {
 
     piece = input.required<Piece>();
 
-    protected highlighted = signal(false);
+    protected selected = signal(false);
     protected position = computed(() => ({ position: this.piece().position }));
     protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
 }
