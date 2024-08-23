@@ -3,7 +3,7 @@ import { extend, injectLoader, NgtArgs, NgtThreeEvent } from 'angular-three';
 import { Mesh, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
 import { getSingleCharacteristic, Piece } from './definitions';
-import { GameStateMachine } from './game-state-machine';
+import { GameActions, GameStateMachine } from './game-state-machine';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -72,6 +72,7 @@ export class GamePieceComponent {
         if (this.gameStateMachine.playing()) {
             event.stopPropagation();
             this.gameStateMachine.toggleSelection(this.piece().characteristics);
+            this.gameStateMachine.nextState(GameActions.PieceSelected);
         }
     }
 }

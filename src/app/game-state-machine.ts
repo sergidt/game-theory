@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, effect, Injectable, signal } from '@angular/core';
 import { IntRange } from './definitions';
 
 export enum GameStates {
@@ -69,9 +69,13 @@ export class GameStateMachine {
         }
     };
 
+    constructor() {
+        effect(() => console.log(`Current state: ${ this.currentState() }`));
+    }
+
     getCurrentStateAvailableActions = () => this.#allowedTransitions[this.currentState()];
 
-    getNextState(action: GameAction) {
+    nextState(action: GameAction) {
         const currentStateActions = this.getCurrentStateAvailableActions();
 
         if (!currentStateActions)

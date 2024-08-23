@@ -22,7 +22,7 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
       @switch (gameStateMachine.currentState()) {
         @case ('NewGame') {
           <div>Are you ready to start a new game?</div>
-          <button (click)="gameStateMachine.getNextState(GameActions.Ready)">Ready!</button>
+          <button (click)="gameStateMachine.nextState(GameActions.Ready)">Ready!</button>
         }
         @case ('UserSelectsPiece') {
           <user-piece-selection/>
@@ -33,7 +33,7 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
         @case ('UserPlacesPiece') {
           <user-piece-placing/>
         }
-        @case ('CPUSelectsPiece') {
+        @case ('CPUPlacesPiece') {
           <cpu-piece-placing/>
         }
         @case ('UserWins') {
