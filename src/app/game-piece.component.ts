@@ -1,6 +1,6 @@
 import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject, input, signal, Signal } from '@angular/core';
 import { extend, injectLoader, NgtArgs, NgtThreeEvent } from 'angular-three';
-import { Mesh, MeshStandardMaterial } from 'three';
+import { Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
 import { getSingleCharacteristic, Piece } from './definitions';
 import { GameActions, GameStateMachine } from './game-state-machine';
@@ -17,7 +17,7 @@ type GLTFResult = GLTF & {
 const DarkColor = '#1d3557';
 const LightColor = '#eacdc2';
 
-extend({ Mesh, MeshStandardMaterial });
+extend({ Mesh, MeshPhysicalMaterial });
 
 @Component({
     selector: 'game-piece',
@@ -32,7 +32,11 @@ extend({ Mesh, MeshStandardMaterial });
                     (click)="clicked($event)"
                     (pointerover)="pointerOver($event)"
                     (pointerout)="pointerOut($event)">
-            <ngt-mesh-standard-material [color]="selected() ? 'red' : highlighted() ? '#ff9e42' : color()"/>
+            <ngt-mesh-physical-material [color]="selected() ? 'red' : highlighted() ? '#ff9e42' : color()"
+                                        [metalness]="0.8"
+                                        [roughness]="0.8"
+                                        [clearcoat]="0.67"
+                                        [clearcoatRoughness]="0.16"/>
           </ngt-mesh>
         </ngt-group>
       }
