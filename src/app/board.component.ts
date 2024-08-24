@@ -15,6 +15,7 @@ extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry, AmbientLight 
     standalone: true,
     template: `
       <ngt-ambient-light [intensity]="1"/>
+
       <ngt-group #group
                  [parameters]="{scale: 0.020, rotation: [Math.PI / 2, Math.PI  , Math.PI / 4]}">
         <ngt-primitive #board
