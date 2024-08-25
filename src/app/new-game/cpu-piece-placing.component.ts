@@ -1,14 +1,27 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component } from '@angular/core';
 
 @Component({
     selector: 'cpu-piece-placing',
     standalone: true,
-    imports: [],
+    imports: [
+        NgOptimizedImage
+    ],
     template: `
-      <p>
-        The opponent is placing the given piece </p>
+      <h4>The opponent is thinking about where to place the piece</h4>
+      <img ngSrc="assets/thinking.png"
+           width="120"
+           height="120"/>
     `,
-    styles: ``
+    styles: `
+      :host {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5em;
+        align-items: center;
+        justify-content: center;
+      }
+    `
 })
 export class CpuPiecePlacingComponent {
 

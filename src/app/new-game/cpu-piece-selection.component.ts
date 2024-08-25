@@ -7,8 +7,19 @@ import { Component } from '@angular/core';
     template: `
       <p>
         The opponent selected this piece for you to place</p>
+      <img ngSrc="assets/thinking.png"
+           width="120"
+           height="120"/>
     `,
-    styles: ``
+    styles: `
+      :host {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5em;
+        align-items: center;
+        justify-content: center;
+      }
+    `
 })
 export class CpuPieceSelectionComponent {
 
