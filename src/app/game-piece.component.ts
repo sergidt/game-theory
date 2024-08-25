@@ -3,7 +3,7 @@ import { extend, injectLoader, NgtArgs, NgtThreeEvent } from 'angular-three';
 import { Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
 import { getSingleCharacteristic, Piece } from './definitions';
-import { GameActions, GameStateMachine } from './game-state-machine';
+import { GameActions, GameStateMachine, GameStates } from './game-state-machine';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -59,21 +59,21 @@ export class GamePieceComponent {
     protected readonly console = console;
 
     pointerOver(event: NgtThreeEvent<PointerEvent>) {
-        if (this.gameStateMachine.playing()) {
+        if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
             event.stopPropagation();
             this.highlighted.set(true);
         }
     }
 
     pointerOut(event: NgtThreeEvent<PointerEvent>) {
-        if (this.gameStateMachine.playing()) {
+        if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
             event.stopPropagation();
             this.highlighted.set(false);
         }
     }
 
     clicked(event: NgtThreeEvent<MouseEvent>) {
-        if (this.gameStateMachine.playing()) {
+        if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
             event.stopPropagation();
             this.gameStateMachine.toggleSelection(this.piece().characteristics);
             this.gameStateMachine.nextState(GameActions.PieceSelected);
