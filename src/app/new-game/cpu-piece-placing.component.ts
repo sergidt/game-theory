@@ -1,5 +1,6 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { GameEngine } from '../game-engine';
 
 @Component({
     selector: 'cpu-piece-placing',
@@ -23,6 +24,10 @@ import { Component } from '@angular/core';
       }
     `
 })
-export class CpuPiecePlacingComponent {
+export class CpuPiecePlacingComponent implements OnInit {
+    #gameEngine = inject(GameEngine);
 
+    ngOnInit() {
+        // console.log(getNextMove(3, this.#gameEngine));
+    }
 }

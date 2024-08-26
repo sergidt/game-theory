@@ -17,7 +17,7 @@ extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry, AmbientLight 
       <ngt-ambient-light [intensity]="1"/>
 
       <ngt-group #group
-                 [parameters]="{scale: 0.020, rotation: [Math.PI / 2, Math.PI  , Math.PI / 4]}">
+                 [parameters]="{scale: 0.020, rotation: [Math.PI / 2, Math.PI  , Math.PI / 3.5]}">
         <ngt-primitive #board
                        *args="[board()?.scene]"/>
 
