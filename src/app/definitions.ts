@@ -179,9 +179,11 @@ export const EMPTY = -1;
 export interface Position {
     row: IntRange<0, 4>;
     col: IntRange<0, 4>;
-    position: NgtVector3;
+    coords: NgtVector3;
     piece: IntRange<0, 16> | typeof EMPTY;
 }
+
+export type Movement = Omit<Position, 'coords'>;
 
 export type Board = [
     Position, Position, Position, Position,

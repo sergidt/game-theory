@@ -1,57 +1,69 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { Board, EMPTY, IntRange, number2binary, PieceProperties, Position } from './definitions';
+import { Board, EMPTY, IntRange, Movement, number2binary, PieceProperties, Position } from './definitions';
 
 @Injectable({ providedIn: 'root' })
 export class GameEngine {
     #board: Board = [
-        { row: 0, col: 0, position: [57, 0, -57], piece: -1 },
-        { row: 0, col: 1, position: [57, 0, -19], piece: -1 },
-        { row: 0, col: 2, position: [57, 0, 19], piece: -1 },
-        { row: 0, col: 3, position: [57, 0, 57], piece: -1 },
-        { row: 1, col: 0, position: [19, 0, -57], piece: -1 },
-        { row: 1, col: 1, position: [19, 0, -19], piece: -1 },
-        { row: 1, col: 2, position: [19, 0, 19], piece: -1 },
-        { row: 1, col: 3, position: [19, 0, 57], piece: -1 },
-        { row: 2, col: 0, position: [-19, 0, -57], piece: -1 },
-        { row: 2, col: 1, position: [-19, 0, -19], piece: -1 },
-        { row: 2, col: 2, position: [-19, 0, 19], piece: -1 },
-        { row: 2, col: 3, position: [-19, 0, 57], piece: -1 },
-        { row: 3, col: 0, position: [-57, 0, -57], piece: -1 },
-        { row: 3, col: 1, position: [-57, 0, -19], piece: -1 },
-        { row: 3, col: 2, position: [-57, 0, 19], piece: -1 },
-        { row: 3, col: 3, position: [-57, 0, 57], piece: -1 },
+        { row: 0, col: 0, coords: [57, 0, -57], piece: -1 },
+        { row: 0, col: 1, coords: [57, 0, -19], piece: -1 },
+        { row: 0, col: 2, coords: [57, 0, 19], piece: -1 },
+        { row: 0, col: 3, coords: [57, 0, 57], piece: -1 },
+        { row: 1, col: 0, coords: [19, 0, -57], piece: -1 },
+        { row: 1, col: 1, coords: [19, 0, -19], piece: -1 },
+        { row: 1, col: 2, coords: [19, 0, 19], piece: -1 },
+        { row: 1, col: 3, coords: [19, 0, 57], piece: -1 },
+        { row: 2, col: 0, coords: [-19, 0, -57], piece: -1 },
+        { row: 2, col: 1, coords: [-19, 0, -19], piece: -1 },
+        { row: 2, col: 2, coords: [-19, 0, 19], piece: -1 },
+        { row: 2, col: 3, coords: [-19, 0, 57], piece: -1 },
+        { row: 3, col: 0, coords: [-57, 0, -57], piece: -1 },
+        { row: 3, col: 1, coords: [-57, 0, -19], piece: -1 },
+        { row: 3, col: 2, coords: [-57, 0, 19], piece: -1 },
+        { row: 3, col: 3, coords: [-57, 0, 57], piece: -1 },
     ];
 
-    #moves: WritableSignal<Position[]> = signal<Position[]>([]);
+    #moves: WritableSignal<Movement[]> = signal<Movement[]>([]);
 
     get board() {
         return this.#board;
     }
 
+    moves = () => this.#moves();
+
     /**
      * Move a piece to a new position.
      * The piece is provided in the position object.
-     * @param position
+     * @param move
      */
-    move(position: Position) {
-        this.#board.splice(this.#board.findIndex((p: Position) => p.row === position.row), 1, position);
+    move(move: Movement) {
+        this.#board = deepClone<Board>(this.#board);
+        this.#board.find((p: Position) => p.row === move.row && p.col === move.col)!.piece = move.piece;
+        this.#moves.set([...this.#moves(), move]);
     }
 
     undo() {
-        const lastMove = this.#moves().pop();
+        const moves = this.#moves();
+        const lastMove = moves.pop();
 
         if (lastMove) {
             // Remove the last piece placed on the board
-            this.move({ position: lastMove.position, row: lastMove.row, col: lastMove.col, piece: EMPTY });
+            this.move({ row: lastMove.row, col: lastMove.col, piece: EMPTY });
+            this.#moves.set(moves);
         }
     }
 }
 
-export function getPossibleMoves(board: Board): Array<Position> {
-    const availablePositions = board.filter(p => p.piece === EMPTY);
+export function deepClone<T>(object: T): T {
+    return JSON.parse(JSON.stringify(object));
+}
+
+export const getEmptyPositions = (board: Board) => board.filter(p => p.piece === EMPTY);
+
+export function getPossibleMoves(board: Board): Array<Movement> {
+    const emptyPositions = getEmptyPositions(board);
     const availablePieces = getAvailablePieces(board);
-    const availableMoves: Array<Position> = [];
-    availablePositions.forEach(position => availablePieces.forEach(piece => availableMoves.push({ ...position, piece })));
+    const availableMoves: Array<Movement> = [];
+    emptyPositions.forEach(({ col, row }) => availablePieces.forEach(piece => availableMoves.push({ row, col, piece })));
     return availableMoves;
 }
 
@@ -160,27 +172,26 @@ export function gameDraw(board: Board): boolean {
     return board.every(p => !!p.piece) && !gameWinner(board);
 }
 
-/*
-export function minimax(game: GameEngine, depth: number, alpha: number, beta: number, maximizing_player: boolean): [Position | null, number] {
+export function minimax(game: GameEngine, depth: number, alpha: number, beta: number, maximizing_player: boolean): [Movement | undefined, number] {
     // if terminal state (game over) or max depth (depth == 0)
     if (gameWinner(game.board) || gameDraw(game.board) || depth === 0) {
-        return [null, evaluatePositions(game.board)];
+        return [undefined, evaluatePositions(game.board)];
     }
 
     let bestMove;
     if (maximizing_player) {
         // find move with the best possible score
         let maxEval = -Infinity;
-        let possibleMoves = getPossibleMoves(board);
+        let possibleMoves = getPossibleMoves(game.board);
 
         for (let i = 0; i < possibleMoves.length; i++) {
-            position.move(possibleMoves[i]);
-            let [childBestMove, childEval] = minimax(position, depth - 1, alpha, beta, false);
+            game.move(possibleMoves[i]);
+            let [childBestMove, childEval] = minimax(game, depth - 1, alpha, beta, false);
             if (childEval > maxEval) {
                 maxEval = childEval;
                 bestMove = possibleMoves[i];
             }
-            position.undo();
+            game.undo();
 
             // alpha beta pruning
             alpha = Math.max(alpha, childEval);
@@ -193,16 +204,16 @@ export function minimax(game: GameEngine, depth: number, alpha: number, beta: nu
     } else {
         // find move with the worst possible score (for maximizer)
         let minEval = +Infinity;
-        let possibleMoves = getPossibleMoves(board);
+        let possibleMoves = getPossibleMoves(game.board);
         for (let i = 0; i < possibleMoves.length; i++) {
 
-            position.move(possibleMoves[i]);
-            let [childBestMove, childEval] = minimax(position, depth - 1, alpha, beta, true);
+            game.move(possibleMoves[i]);
+            let [childBestMove, childEval] = minimax(game, depth - 1, alpha, beta, true);
             if (childEval < minEval) {
                 minEval = childEval;
                 bestMove = possibleMoves[i];
             }
-            position.undo();
+            game.undo();
 
             // alpha beta pruning
             beta = Math.min(beta, childEval);
@@ -213,7 +224,5 @@ export function minimax(game: GameEngine, depth: number, alpha: number, beta: nu
         return [bestMove, minEval];
     }
 }
-
- */
 
 

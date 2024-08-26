@@ -2,7 +2,6 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal } from '@angular/core
 import { RouterOutlet } from '@angular/router';
 import { NgtCanvas } from 'angular-three';
 import { Board } from './board.component';
-import { PIECES } from './definitions';
 import { GameDialogComponent } from './dialog.component';
 import { GameDescriptionComponent } from './game-description.component';
 import { GameEngine, getAvailablePieces, getPossibleMoves } from './game-engine';
@@ -60,7 +59,7 @@ export class AppComponent {
     constructor() {
         let availablePieces = getAvailablePieces(this.#game.board);
         let availablePositions = getPossibleMoves(this.#game.board);
-        this.#game.move({ ...availablePositions[0], piece: PIECES[0].characteristics });
+        //   this.#game.move({ ...availablePositions[0], piece: PIECES[0].characteristics });
         console.log('Board', this.#game.board);
         console.log('possible moves: ', getPossibleMoves(this.#game.board));
     }
