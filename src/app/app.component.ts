@@ -4,7 +4,7 @@ import { NgtCanvas } from 'angular-three';
 import { Board } from './board.component';
 import { GameDialogComponent } from './dialog.component';
 import { GameDescriptionComponent } from './game-description.component';
-import { GameEngine, getAvailablePieces, getPossibleMoves } from './game-engine';
+import { COUNTER, evaluateBoard, gameDraw, GameEngine, gameWinner, minimax, printBoard } from './game-engine';
 import { GameGuideComponent } from './new-game/game-guide.component';
 
 @Component({
@@ -57,10 +57,27 @@ export class AppComponent {
     #game = inject(GameEngine);
 
     constructor() {
-        let availablePieces = getAvailablePieces(this.#game.board);
-        let availablePositions = getPossibleMoves(this.#game.board);
-        //   this.#game.move({ ...availablePositions[0], piece: PIECES[0].characteristics });
-        console.log('Board', this.#game.board);
-        console.log('possible moves: ', getPossibleMoves(this.#game.board));
+        this.#game.move({ row: 0, col: 0, piece: 2 });
+        this.#game.move({ row: 0, col: 1, piece: 14 });
+        this.#game.move({ row: 0, col: 2, piece: 3 });
+        this.#game.move({ row: 0, col: 3, piece: 4 });
+        this.#game.move({ row: 1, col: 1, piece: 6 });
+        this.#game.move({ row: 1, col: 0, piece: 1 });
+        this.#game.move({ row: 1, col: 3, piece: 5 });
+        this.#game.move({ row: 2, col: 1, piece: 7 });
+        this.#game.move({ row: 2, col: 2, piece: 13 });
+        this.#game.move({ row: 2, col: 3, piece: 9 });
+        this.#game.move({ row: 3, col: 0, piece: 12 });
+        this.#game.move({ row: 3, col: 1, piece: 0 });
+        this.#game.move({ row: 3, col: 2, piece: 10 });
+        //this.#game.move({ row: 3, col: 3, piece: 15 });
+
+        console.log('winner', gameWinner(this.#game.board));
+        console.log('draw', gameDraw(this.#game.board));
+        console.log('eval', evaluateBoard(this.#game.board));
+        printBoard(this.#game.board);
+        console.log('Minimax', minimax(this.#game, 0, Number.POSITIVE_INFINITY, true));
+
+        console.log('counter', COUNTER);
     }
 }

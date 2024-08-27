@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { Board, EMPTY, IntRange, Movement, number2binary, PieceProperties, Position } from './definitions';
+import { Board, EMPTY, IntRange, Movement, number2binary, Position } from './definitions';
 
 @Injectable({ providedIn: 'root' })
 export class GameEngine {
@@ -127,28 +127,48 @@ const getColumns = (board: Board) => Array.from(new Array(4), (_, i) => [board[i
 const getDiagonal1 = (board: Board) => [board[0], board[5], board[10], board[15]];
 const getDiagonal2 = (board: Board) => [board[3], board[6], board[9], board[12]];
 
-function evaluateBoard(board: Board): number {
-    const rows = getRows(board);
-    const columns = getColumns(board);
-    const diagonal1 = getDiagonal1(board);
-    const diagonal2 = getDiagonal2(board);
+export function evaluateBoard(board: Board): number {
+    if (gameWinner(board))
+        return 1000;
+    else {
+        const rows = getRows(board);
+        const columns = getColumns(board);
+        const diagonal1 = getDiagonal1(board);
+        const diagonal2 = getDiagonal2(board);
 
-    return rows.concat(columns).concat([diagonal1], [diagonal2])
-               .map(pieces => evaluatePositions(pieces)).reduce((acc, cur) => acc + cur, 0);
+        return rows.concat(columns).concat([diagonal1], [diagonal2])
+                   .map(pieces => evaluatePositions(pieces)).reduce((acc, cur) => acc + cur, 0);
+    }
+}
+
+const MATCHES = Array.from(new Array(4), (_, i) => new Array(i + 1).fill(1).join(''))
+                     .concat(Array.from(new Array(4), (_, i) => new Array(i + 1).fill('0').join('')));
+
+export function featuresByPosition(positions: Position[]) {
+    const filledPositions = positions.filter(p => p.piece !== EMPTY);
+    const concatenated = filledPositions.map(p => number2binary(p.piece)).join('');
+    //  if (filledPositions.length === 4)
+    //      console.log('positions', positions, concatenated);
+
+    const featuresByPosition = [];
+
+    for (let i = 0; i < 4; i++) {
+        let chars = '';
+        for (let j = 0; j < filledPositions.length; j++) {
+            chars += concatenated[j * 4 + i];
+        }
+        featuresByPosition.push(chars);
+    }
+    //  if (filledPositions.length === 4)
+    //      console.log('>>>', featuresByPosition);
+
+    return featuresByPosition;
 }
 
 function evaluatePositions(positions: Position[]) {
-    const filledPositions = positions.filter(p => !!p.piece);
-
-    //console.log('Evaluating:\n', filledPositions.map(p => PIECES[p.piece!]).join('\n'));
-
-    const value = filledPositions.reduce((acc, cur) => acc & cur.piece, filledPositions.length ? 15 : 0);
-
-    const commonFeatures = number2binary(value)
-        .split('')
-        .reduce((acc: string[], cur, currentIndex) => cur === '1' ? [...acc, PieceProperties[currentIndex]] : acc, []);
-    // console.log('Common features:', commonFeatures);
-    return commonFeatures.length;
+    const features = featuresByPosition(positions);
+    const coincidences = features.reduce((acc, cur) => acc + (MATCHES.includes(cur) ? 1 : 0), 0);
+    return coincidences ? coincidences * 10 : featuresByPosition.length * -10;
 }
 
 export function getAvailablePieces(board: Board): Array<IntRange<0, 16>> {
@@ -163,16 +183,27 @@ export function gameWinner(board: Board): boolean {
     const columns = getColumns(board);
     const diagonal1 = getDiagonal1(board);
     const diagonal2 = getDiagonal2(board);
-
     return rows.concat(columns).concat([diagonal1], [diagonal2])
-               .map(pieces => evaluatePositions(pieces)).reduce((acc, cur) => acc + cur, 0) === 4;
+               .some(pieces => featuresByPosition(pieces).includes('1111') || featuresByPosition(pieces).includes('0000'));
 }
 
 export function gameDraw(board: Board): boolean {
-    return board.every(p => !!p.piece) && !gameWinner(board);
+    return board.every(p => p.piece !== EMPTY) && !gameWinner(board);
 }
 
-export function minimax(game: GameEngine, depth: number, alpha: number, beta: number, maximizing_player: boolean): [Movement | undefined, number] {
+export function printBoard(board: Board) {
+    console.log(
+        getRows(board)
+            .map(row => row.map(p => p.piece === EMPTY ? '    ' : number2binary(p.piece)).join(' | ')).join('\n--------------------------\n')
+    );
+}
+
+export let COUNTER = 0;
+
+export const DEPTH = 2;
+
+export function minimax(game: GameEngine, alpha: number, beta: number, maximizing_player: boolean, depth = DEPTH): [Movement | undefined, number] {
+    COUNTER++;
     // if terminal state (game over) or max depth (depth == 0)
     if (gameWinner(game.board) || gameDraw(game.board) || depth === 0) {
         return [undefined, evaluatePositions(game.board)];
@@ -186,12 +217,15 @@ export function minimax(game: GameEngine, depth: number, alpha: number, beta: nu
 
         for (let i = 0; i < possibleMoves.length; i++) {
             game.move(possibleMoves[i]);
-            let [childBestMove, childEval] = minimax(game, depth - 1, alpha, beta, false);
+            let [childBestMove, childEval] = minimax(game, alpha, beta, false, depth - 1);
             if (childEval > maxEval) {
+                console.log(1);
                 maxEval = childEval;
                 bestMove = possibleMoves[i];
             }
             game.undo();
+
+            console.log('Level: ', DEPTH - depth);
 
             // alpha beta pruning
             alpha = Math.max(alpha, childEval);
@@ -208,12 +242,15 @@ export function minimax(game: GameEngine, depth: number, alpha: number, beta: nu
         for (let i = 0; i < possibleMoves.length; i++) {
 
             game.move(possibleMoves[i]);
-            let [childBestMove, childEval] = minimax(game, depth - 1, alpha, beta, true);
+            let [childBestMove, childEval] = minimax(game, alpha, beta, true, depth - 1);
             if (childEval < minEval) {
+                console.log(2);
                 minEval = childEval;
                 bestMove = possibleMoves[i];
             }
             game.undo();
+
+            console.log('Level: ', DEPTH - depth);
 
             // alpha beta pruning
             beta = Math.min(beta, childEval);
