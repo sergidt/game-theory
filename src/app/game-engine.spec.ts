@@ -62,155 +62,156 @@ describe('Game Engine', () => {
             expect(engine.moves().length).toBe(0);
         });
     });
-});
 
-describe('canWin', () => {
-    it('returns true and the winning move when a winning move is available', () => {
-        const board: Board = [
-            { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
-            { row: 0, col: 1, coords: [57, 0, -19], piece: 1 },
-            { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
-            { row: 0, col: 3, coords: [57, 0, 57], piece: EMPTY },
-            { row: 1, col: 0, coords: [19, 0, -57], piece: 4 },
-            { row: 1, col: 1, coords: [19, 0, -19], piece: 5 },
-            { row: 1, col: 2, coords: [19, 0, 19], piece: 6 },
-            { row: 1, col: 3, coords: [19, 0, 57], piece: 7 },
-            { row: 2, col: 0, coords: [-19, 0, -57], piece: 8 },
-            { row: 2, col: 1, coords: [-19, 0, -19], piece: 9 },
-            { row: 2, col: 2, coords: [-19, 0, 19], piece: 10 },
-            { row: 2, col: 3, coords: [-19, 0, 57], piece: 11 },
-            { row: 3, col: 0, coords: [-57, 0, -57], piece: 12 },
-            { row: 3, col: 1, coords: [-57, 0, -19], piece: 13 },
-            { row: 3, col: 2, coords: [-57, 0, 19], piece: 14 },
-            { row: 3, col: 3, coords: [-57, 0, 57], piece: 15 },
-        ];
-        const result = canWin(board, 3);
-        expect(result.win).toBe(true);
-        expect(result.move).toEqual({ row: 0, col: 3, piece: 3 });
+    describe('canWin', () => {
+        it('returns true and the winning move when a winning move is available', () => {
+            const board: Board = [
+                { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
+                { row: 0, col: 1, coords: [57, 0, -19], piece: 1 },
+                { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
+                { row: 0, col: 3, coords: [57, 0, 57], piece: EMPTY },
+                { row: 1, col: 0, coords: [19, 0, -57], piece: 4 },
+                { row: 1, col: 1, coords: [19, 0, -19], piece: 5 },
+                { row: 1, col: 2, coords: [19, 0, 19], piece: 6 },
+                { row: 1, col: 3, coords: [19, 0, 57], piece: 7 },
+                { row: 2, col: 0, coords: [-19, 0, -57], piece: 8 },
+                { row: 2, col: 1, coords: [-19, 0, -19], piece: 9 },
+                { row: 2, col: 2, coords: [-19, 0, 19], piece: 10 },
+                { row: 2, col: 3, coords: [-19, 0, 57], piece: 11 },
+                { row: 3, col: 0, coords: [-57, 0, -57], piece: 12 },
+                { row: 3, col: 1, coords: [-57, 0, -19], piece: 13 },
+                { row: 3, col: 2, coords: [-57, 0, 19], piece: 14 },
+                { row: 3, col: 3, coords: [-57, 0, 57], piece: 15 },
+            ];
+            const result = canWin(board, 3);
+            expect(result.win).toBe(true);
+            expect(result.move).toEqual({ row: 0, col: 3, piece: 3 });
+        });
+
+        it('returns false and undefined move when no winning move is available', () => {
+            const board: Board = [
+                { row: 0, col: 0, coords: [57, 0, -57], piece: 15 },
+                { row: 0, col: 1, coords: [57, 0, -19], piece: 0 },
+                { row: 0, col: 2, coords: [57, 0, 19], piece: 0 },
+                { row: 0, col: 3, coords: [57, 0, 57], piece: 15 },
+                { row: 1, col: 0, coords: [19, 0, -57], piece: 0 },
+                { row: 1, col: 1, coords: [19, 0, -19], piece: 15 },
+                { row: 1, col: 2, coords: [19, 0, 19], piece: 0 },
+                { row: 1, col: 3, coords: [19, 0, 57], piece: 15 },
+                { row: 2, col: 0, coords: [-19, 0, -57], piece: 15 },
+                { row: 2, col: 1, coords: [-19, 0, -19], piece: 15 },
+                { row: 2, col: 2, coords: [-19, 0, 19], piece: 0 },
+                { row: 2, col: 3, coords: [-19, 0, 57], piece: 0 },
+                { row: 3, col: 0, coords: [-57, 0, -57], piece: 0 },
+                { row: 3, col: 1, coords: [-57, 0, -19], piece: 15 },
+                { row: 3, col: 2, coords: [-57, 0, 19], piece: 15 },
+                { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
+            ];
+            const result = canWin(board, 3);
+            expect(result.win).toBe(false);
+            expect(result.move).toBeUndefined();
+        });
+
+        it('returns false and undefined move when the board is full', () => {
+            const board: Board = [
+                { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
+                { row: 0, col: 1, coords: [57, 0, -19], piece: 1 },
+                { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
+                { row: 0, col: 3, coords: [57, 0, 57], piece: 3 },
+                { row: 1, col: 0, coords: [19, 0, -57], piece: 4 },
+                { row: 1, col: 1, coords: [19, 0, -19], piece: 5 },
+                { row: 1, col: 2, coords: [19, 0, 19], piece: 6 },
+                { row: 1, col: 3, coords: [19, 0, 57], piece: 7 },
+                { row: 2, col: 0, coords: [-19, 0, -57], piece: 8 },
+                { row: 2, col: 1, coords: [-19, 0, -19], piece: 9 },
+                { row: 2, col: 2, coords: [-19, 0, 19], piece: 10 },
+                { row: 2, col: 3, coords: [-19, 0, 57], piece: 11 },
+                { row: 3, col: 0, coords: [-57, 0, -57], piece: 12 },
+                { row: 3, col: 1, coords: [-57, 0, -19], piece: 13 },
+                { row: 3, col: 2, coords: [-57, 0, 19], piece: 14 },
+                { row: 3, col: 3, coords: [-57, 0, 57], piece: 15 },
+            ];
+            const result = canWin(board, 3);
+            expect(result.win).toBe(false);
+            expect(result.move).toBeUndefined();
+        });
     });
 
-    it('returns false and undefined move when no winning move is available', () => {
-        const board: Board = [
-            { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
-            { row: 0, col: 1, coords: [57, 0, -19], piece: 1 },
-            { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
-            { row: 0, col: 3, coords: [57, 0, 57], piece: 4 },
-            { row: 1, col: 0, coords: [19, 0, -57], piece: 5 },
-            { row: 1, col: 1, coords: [19, 0, -19], piece: 6 },
-            { row: 1, col: 2, coords: [19, 0, 19], piece: 7 },
-            { row: 1, col: 3, coords: [19, 0, 57], piece: 8 },
-            { row: 2, col: 0, coords: [-19, 0, -57], piece: 9 },
-            { row: 2, col: 1, coords: [-19, 0, -19], piece: 10 },
-            { row: 2, col: 2, coords: [-19, 0, 19], piece: 11 },
-            { row: 2, col: 3, coords: [-19, 0, 57], piece: 12 },
-            { row: 3, col: 0, coords: [-57, 0, -57], piece: 13 },
-            { row: 3, col: 1, coords: [-57, 0, -19], piece: 14 },
-            { row: 3, col: 2, coords: [-57, 0, 19], piece: 15 },
-            { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
-        ];
-        const result = canWin(board, 3);
-        expect(result.win).toBe(false);
-        expect(result.move).toBeUndefined();
+    describe('getPossibleMoves', () => {
+        it('returns all possible moves when the board is empty', () => {
+            const board: Board = [
+                { row: 0, col: 0, coords: [57, 0, -57], piece: EMPTY },
+                { row: 0, col: 1, coords: [57, 0, -19], piece: EMPTY },
+                { row: 0, col: 2, coords: [57, 0, 19], piece: EMPTY },
+                { row: 0, col: 3, coords: [57, 0, 57], piece: EMPTY },
+                { row: 1, col: 0, coords: [19, 0, -57], piece: EMPTY },
+                { row: 1, col: 1, coords: [19, 0, -19], piece: EMPTY },
+                { row: 1, col: 2, coords: [19, 0, 19], piece: EMPTY },
+                { row: 1, col: 3, coords: [19, 0, 57], piece: EMPTY },
+                { row: 2, col: 0, coords: [-19, 0, -57], piece: EMPTY },
+                { row: 2, col: 1, coords: [-19, 0, -19], piece: EMPTY },
+                { row: 2, col: 2, coords: [-19, 0, 19], piece: EMPTY },
+                { row: 2, col: 3, coords: [-19, 0, 57], piece: EMPTY },
+                { row: 3, col: 0, coords: [-57, 0, -57], piece: EMPTY },
+                { row: 3, col: 1, coords: [-57, 0, -19], piece: EMPTY },
+                { row: 3, col: 2, coords: [-57, 0, 19], piece: EMPTY },
+                { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
+            ];
+            const moves = getPossibleMoves(board);
+            expect(moves.length).toBe(16 * 16);
+        });
+
+        it('returns no moves when the board is full', () => {
+            const board: Board = [
+                { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
+                { row: 0, col: 1, coords: [57, 0, -19], piece: 1 },
+                { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
+                { row: 0, col: 3, coords: [57, 0, 57], piece: 3 },
+                { row: 1, col: 0, coords: [19, 0, -57], piece: 4 },
+                { row: 1, col: 1, coords: [19, 0, -19], piece: 5 },
+                { row: 1, col: 2, coords: [19, 0, 19], piece: 6 },
+                { row: 1, col: 3, coords: [19, 0, 57], piece: 7 },
+                { row: 2, col: 0, coords: [-19, 0, -57], piece: 8 },
+                { row: 2, col: 1, coords: [-19, 0, -19], piece: 9 },
+                { row: 2, col: 2, coords: [-19, 0, 19], piece: 10 },
+                { row: 2, col: 3, coords: [-19, 0, 57], piece: 11 },
+                { row: 3, col: 0, coords: [-57, 0, -57], piece: 12 },
+                { row: 3, col: 1, coords: [-57, 0, -19], piece: 13 },
+                { row: 3, col: 2, coords: [-57, 0, 19], piece: 14 },
+                { row: 3, col: 3, coords: [-57, 0, 57], piece: 15 },
+            ];
+            const moves = getPossibleMoves(board);
+            expect(moves.length).toBe(0);
+        });
+
+        it('returns correct moves when some positions are empty', () => {
+            const board: Board = [
+                { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
+                { row: 0, col: 1, coords: [57, 0, -19], piece: EMPTY },
+                { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
+                { row: 0, col: 3, coords: [57, 0, 57], piece: EMPTY },
+                { row: 1, col: 0, coords: [19, 0, -57], piece: 4 },
+                { row: 1, col: 1, coords: [19, 0, -19], piece: EMPTY },
+                { row: 1, col: 2, coords: [19, 0, 19], piece: 6 },
+                { row: 1, col: 3, coords: [19, 0, 57], piece: EMPTY },
+                { row: 2, col: 0, coords: [-19, 0, -57], piece: 8 },
+                { row: 2, col: 1, coords: [-19, 0, -19], piece: EMPTY },
+                { row: 2, col: 2, coords: [-19, 0, 19], piece: 10 },
+                { row: 2, col: 3, coords: [-19, 0, 57], piece: EMPTY },
+                { row: 3, col: 0, coords: [-57, 0, -57], piece: 12 },
+                { row: 3, col: 1, coords: [-57, 0, -19], piece: EMPTY },
+                { row: 3, col: 2, coords: [-57, 0, 19], piece: 14 },
+                { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
+            ];
+            const availablePieces = getAvailablePieces(board);
+            const emptyPositions = getEmptyPositions(board);
+
+            expect(availablePieces.length).toBe(8);
+            expect(emptyPositions.length).toBe(8);
+
+            const moves = getPossibleMoves(board);
+            expect(moves.length).toBe(emptyPositions.length * availablePieces.length);
+        });
     });
 
-    it('returns false and undefined move when the board is full', () => {
-        const board: Board = [
-            { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
-            { row: 0, col: 1, coords: [57, 0, -19], piece: 1 },
-            { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
-            { row: 0, col: 3, coords: [57, 0, 57], piece: 3 },
-            { row: 1, col: 0, coords: [19, 0, -57], piece: 4 },
-            { row: 1, col: 1, coords: [19, 0, -19], piece: 5 },
-            { row: 1, col: 2, coords: [19, 0, 19], piece: 6 },
-            { row: 1, col: 3, coords: [19, 0, 57], piece: 7 },
-            { row: 2, col: 0, coords: [-19, 0, -57], piece: 8 },
-            { row: 2, col: 1, coords: [-19, 0, -19], piece: 9 },
-            { row: 2, col: 2, coords: [-19, 0, 19], piece: 10 },
-            { row: 2, col: 3, coords: [-19, 0, 57], piece: 11 },
-            { row: 3, col: 0, coords: [-57, 0, -57], piece: 12 },
-            { row: 3, col: 1, coords: [-57, 0, -19], piece: 13 },
-            { row: 3, col: 2, coords: [-57, 0, 19], piece: 14 },
-            { row: 3, col: 3, coords: [-57, 0, 57], piece: 15 },
-        ];
-        const result = canWin(board, 3);
-        expect(result.win).toBe(false);
-        expect(result.move).toBeUndefined();
-    });
-});
-
-describe('getPossibleMoves', () => {
-    it('returns all possible moves when the board is empty', () => {
-        const board: Board = [
-            { row: 0, col: 0, coords: [57, 0, -57], piece: EMPTY },
-            { row: 0, col: 1, coords: [57, 0, -19], piece: EMPTY },
-            { row: 0, col: 2, coords: [57, 0, 19], piece: EMPTY },
-            { row: 0, col: 3, coords: [57, 0, 57], piece: EMPTY },
-            { row: 1, col: 0, coords: [19, 0, -57], piece: EMPTY },
-            { row: 1, col: 1, coords: [19, 0, -19], piece: EMPTY },
-            { row: 1, col: 2, coords: [19, 0, 19], piece: EMPTY },
-            { row: 1, col: 3, coords: [19, 0, 57], piece: EMPTY },
-            { row: 2, col: 0, coords: [-19, 0, -57], piece: EMPTY },
-            { row: 2, col: 1, coords: [-19, 0, -19], piece: EMPTY },
-            { row: 2, col: 2, coords: [-19, 0, 19], piece: EMPTY },
-            { row: 2, col: 3, coords: [-19, 0, 57], piece: EMPTY },
-            { row: 3, col: 0, coords: [-57, 0, -57], piece: EMPTY },
-            { row: 3, col: 1, coords: [-57, 0, -19], piece: EMPTY },
-            { row: 3, col: 2, coords: [-57, 0, 19], piece: EMPTY },
-            { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
-        ];
-        const moves = getPossibleMoves(board);
-        expect(moves.length).toBe(16 * 16);
-    });
-
-    it('returns no moves when the board is full', () => {
-        const board: Board = [
-            { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
-            { row: 0, col: 1, coords: [57, 0, -19], piece: 1 },
-            { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
-            { row: 0, col: 3, coords: [57, 0, 57], piece: 3 },
-            { row: 1, col: 0, coords: [19, 0, -57], piece: 4 },
-            { row: 1, col: 1, coords: [19, 0, -19], piece: 5 },
-            { row: 1, col: 2, coords: [19, 0, 19], piece: 6 },
-            { row: 1, col: 3, coords: [19, 0, 57], piece: 7 },
-            { row: 2, col: 0, coords: [-19, 0, -57], piece: 8 },
-            { row: 2, col: 1, coords: [-19, 0, -19], piece: 9 },
-            { row: 2, col: 2, coords: [-19, 0, 19], piece: 10 },
-            { row: 2, col: 3, coords: [-19, 0, 57], piece: 11 },
-            { row: 3, col: 0, coords: [-57, 0, -57], piece: 12 },
-            { row: 3, col: 1, coords: [-57, 0, -19], piece: 13 },
-            { row: 3, col: 2, coords: [-57, 0, 19], piece: 14 },
-            { row: 3, col: 3, coords: [-57, 0, 57], piece: 15 },
-        ];
-        const moves = getPossibleMoves(board);
-        expect(moves.length).toBe(0);
-    });
-
-    it('returns correct moves when some positions are empty', () => {
-        const board: Board = [
-            { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
-            { row: 0, col: 1, coords: [57, 0, -19], piece: EMPTY },
-            { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
-            { row: 0, col: 3, coords: [57, 0, 57], piece: EMPTY },
-            { row: 1, col: 0, coords: [19, 0, -57], piece: 4 },
-            { row: 1, col: 1, coords: [19, 0, -19], piece: EMPTY },
-            { row: 1, col: 2, coords: [19, 0, 19], piece: 6 },
-            { row: 1, col: 3, coords: [19, 0, 57], piece: EMPTY },
-            { row: 2, col: 0, coords: [-19, 0, -57], piece: 8 },
-            { row: 2, col: 1, coords: [-19, 0, -19], piece: EMPTY },
-            { row: 2, col: 2, coords: [-19, 0, 19], piece: 10 },
-            { row: 2, col: 3, coords: [-19, 0, 57], piece: EMPTY },
-            { row: 3, col: 0, coords: [-57, 0, -57], piece: 12 },
-            { row: 3, col: 1, coords: [-57, 0, -19], piece: EMPTY },
-            { row: 3, col: 2, coords: [-57, 0, 19], piece: 14 },
-            { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
-        ];
-        const availablePieces = getAvailablePieces(board);
-        const emptyPositions = getEmptyPositions(board);
-
-        expect(availablePieces.length).toBe(8);
-        expect(emptyPositions.length).toBe(8);
-
-        const moves = getPossibleMoves(board);
-        expect(moves.length).toBe(emptyPositions.length * availablePieces.length);
-    });
 });

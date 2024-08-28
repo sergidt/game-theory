@@ -128,8 +128,7 @@ const getDiagonal1 = (board: Board) => [board[0], board[5], board[10], board[15]
 const getDiagonal2 = (board: Board) => [board[3], board[6], board[9], board[12]];
 
 export function evaluateBoard(board: Board): number {
-    if (gameWinner(board))
-        return 1000;
+    if (gameWinner(board).winner) return 1000;
     else {
         const rows = getRows(board);
         const columns = getColumns(board);
@@ -178,17 +177,34 @@ export function getAvailablePieces(board: Board): Array<IntRange<0, 16>> {
     return Array.from(pieces);
 }
 
-export function gameWinner(board: Board): boolean {
+export interface WinningLine {
+    winner: boolean;
+    positions: Position[];
+}
+
+export function gameWinner(board: Board): WinningLine {
     const rows = getRows(board);
     const columns = getColumns(board);
     const diagonal1 = getDiagonal1(board);
     const diagonal2 = getDiagonal2(board);
     return rows.concat(columns).concat([diagonal1], [diagonal2])
-               .some(pieces => featuresByPosition(pieces).includes('1111') || featuresByPosition(pieces).includes('0000'));
+               .reduce((acc: WinningLine, line: Position[]) => {
+                   if (acc.winner) {
+                       return acc as WinningLine;
+                   } else {
+                       const features = featuresByPosition(line);
+
+                       if (features.includes('1111') || features.includes('0000')) {
+                           return { winner: true, positions: line };
+                       } else {
+                           return acc as WinningLine;
+                       }
+                   }
+               }, { winner: false, positions: [] });
 }
 
 export function gameDraw(board: Board): boolean {
-    return board.every(p => p.piece !== EMPTY) && !gameWinner(board);
+    return board.every(p => p.piece !== EMPTY) && !gameWinner(board).winner;
 }
 
 export function printBoard(board: Board) {
@@ -217,7 +233,8 @@ export function canWin(board: Board, piece: IntRange<0, 16>): CanWin {
                 const clonedBoard = deepClone<Board>(board);
                 const position = clonedBoard.find((p: Position) => p.row === move.row && p.col === move.col);
                 clonedBoard.splice(clonedBoard.indexOf(position!), 1, { ...position, ...move } as Position);
-                return { win: gameWinner(clonedBoard), move: move };
+                const win = gameWinner(clonedBoard).winner;
+                return { win, move: win ? move : acc.move };
             }
         }, { win: false, move: undefined });
 }
@@ -231,7 +248,7 @@ export function minimax(game: GameEngine, alpha: number, beta: number, maximizin
     piece?: IntRange<0, 16>): [Move | undefined, number] {
     COUNTER++;
     // if terminal state (game over) or max depth (depth == 0)
-    if (gameWinner(game.board) || gameDraw(game.board) || depth === 0) {
+    if (gameWinner(game.board).winner || gameDraw(game.board) || depth === 0) {
         printBoard(game.board);
 
         return [undefined, evaluatePositions(game.board)];
