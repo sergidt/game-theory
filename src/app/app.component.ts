@@ -2,9 +2,10 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal } from '@angular/core
 import { RouterOutlet } from '@angular/router';
 import { NgtCanvas } from 'angular-three';
 import { Board } from './board.component';
+import { EMPTY } from './definitions';
 import { GameDialogComponent } from './dialog.component';
 import { GameDescriptionComponent } from './game-description.component';
-import { COUNTER, evaluateBoard, gameDraw, GameEngine, gameWinner, minimax, printBoard } from './game-engine';
+import { canWin, DEPTH, GameEngine, gameWinner, minimax, printBoard } from './game-engine';
 import { GameGuideComponent } from './new-game/game-guide.component';
 
 @Component({
@@ -72,12 +73,70 @@ export class AppComponent {
         this.#game.move({ row: 3, col: 2, piece: 10 });
         //this.#game.move({ row: 3, col: 3, piece: 15 });
 
-        console.log('winner', gameWinner(this.#game.board));
-        console.log('draw', gameDraw(this.#game.board));
-        console.log('eval', evaluateBoard(this.#game.board));
-        printBoard(this.#game.board);
-        console.log('Minimax', minimax(this.#game, 0, Number.POSITIVE_INFINITY, true));
+        //console.log('winner', gameWinner(this.#game.board));
+        //console.log('draw', gameDraw(this.#game.board));
+        //console.log('eval', evaluateBoard(this.#game.board));
 
-        console.log('counter', COUNTER);
+        // console.log('Next move: ', nextMove(this.#game, 8));
+        printBoard([
+            { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
+            { row: 0, col: 1, coords: [57, 0, -19], piece: 1 },
+            { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
+            { row: 0, col: 3, coords: [57, 0, 57], piece: 4 },
+            { row: 1, col: 0, coords: [19, 0, -57], piece: 5 },
+            { row: 1, col: 1, coords: [19, 0, -19], piece: 6 },
+            { row: 1, col: 2, coords: [19, 0, 19], piece: 7 },
+            { row: 1, col: 3, coords: [19, 0, 57], piece: 8 },
+            { row: 2, col: 0, coords: [-19, 0, -57], piece: 9 },
+            { row: 2, col: 1, coords: [-19, 0, -19], piece: 10 },
+            { row: 2, col: 2, coords: [-19, 0, 19], piece: 11 },
+            { row: 2, col: 3, coords: [-19, 0, 57], piece: 12 },
+            { row: 3, col: 0, coords: [-57, 0, -57], piece: 13 },
+            { row: 3, col: 1, coords: [-57, 0, -19], piece: 14 },
+            { row: 3, col: 2, coords: [-57, 0, 19], piece: 15 },
+            { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
+        ]);
+
+        console.log('Winner', gameWinner([
+            { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
+            { row: 0, col: 1, coords: [57, 0, -19], piece: 1 },
+            { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
+            { row: 0, col: 3, coords: [57, 0, 57], piece: 4 },
+            { row: 1, col: 0, coords: [19, 0, -57], piece: 5 },
+            { row: 1, col: 1, coords: [19, 0, -19], piece: 6 },
+            { row: 1, col: 2, coords: [19, 0, 19], piece: 7 },
+            { row: 1, col: 3, coords: [19, 0, 57], piece: 8 },
+            { row: 2, col: 0, coords: [-19, 0, -57], piece: 9 },
+            { row: 2, col: 1, coords: [-19, 0, -19], piece: 10 },
+            { row: 2, col: 2, coords: [-19, 0, 19], piece: 11 },
+            { row: 2, col: 3, coords: [-19, 0, 57], piece: 12 },
+            { row: 3, col: 0, coords: [-57, 0, -57], piece: 13 },
+            { row: 3, col: 1, coords: [-57, 0, -19], piece: 14 },
+            { row: 3, col: 2, coords: [-57, 0, 19], piece: 15 },
+            { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
+        ]));
+        console.log('Can win', canWin([
+            { row: 0, col: 0, coords: [57, 0, -57], piece: 0 },
+            { row: 0, col: 1, coords: [57, 0, -19], piece: 1 },
+            { row: 0, col: 2, coords: [57, 0, 19], piece: 2 },
+            { row: 0, col: 3, coords: [57, 0, 57], piece: 4 },
+            { row: 1, col: 0, coords: [19, 0, -57], piece: 5 },
+            { row: 1, col: 1, coords: [19, 0, -19], piece: 6 },
+            { row: 1, col: 2, coords: [19, 0, 19], piece: 7 },
+            { row: 1, col: 3, coords: [19, 0, 57], piece: 8 },
+            { row: 2, col: 0, coords: [-19, 0, -57], piece: 9 },
+            { row: 2, col: 1, coords: [-19, 0, -19], piece: 10 },
+            { row: 2, col: 2, coords: [-19, 0, 19], piece: 11 },
+            { row: 2, col: 3, coords: [-19, 0, 57], piece: 12 },
+            { row: 3, col: 0, coords: [-57, 0, -57], piece: 13 },
+            { row: 3, col: 1, coords: [-57, 0, -19], piece: 14 },
+            { row: 3, col: 2, coords: [-57, 0, 19], piece: 15 },
+            { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
+        ], 3));
+        printBoard(this.#game.board);
+
+        console.log('Minimax', minimax(this.#game, 0, Number.POSITIVE_INFINITY, true, DEPTH, 8));
+
+        //  console.log('counter', COUNTER);
     }
 }

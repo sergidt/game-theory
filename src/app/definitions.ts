@@ -183,7 +183,7 @@ export interface Position {
     piece: IntRange<0, 16> | typeof EMPTY;
 }
 
-export type Movement = Omit<Position, 'coords'>;
+export type Move = Omit<Position, 'coords'>;
 
 export type Board = [
     Position, Position, Position, Position,

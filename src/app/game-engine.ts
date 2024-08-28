@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { Board, EMPTY, IntRange, Movement, number2binary, Position } from './definitions';
+import { Board, EMPTY, IntRange, Move, number2binary, Position } from './definitions';
 
 @Injectable({ providedIn: 'root' })
 export class GameEngine {
@@ -22,7 +22,7 @@ export class GameEngine {
         { row: 3, col: 3, coords: [-57, 0, 57], piece: -1 },
     ];
 
-    #moves: WritableSignal<Movement[]> = signal<Movement[]>([]);
+    #moves: WritableSignal<Move[]> = signal<Move[]>([]);
 
     get board() {
         return this.#board;
@@ -35,7 +35,7 @@ export class GameEngine {
      * The piece is provided in the position object.
      * @param move
      */
-    move(move: Movement) {
+    move(move: Move) {
         this.#board = deepClone<Board>(this.#board);
         this.#board.find((p: Position) => p.row === move.row && p.col === move.col)!.piece = move.piece;
         this.#moves.set([...this.#moves(), move]);
@@ -59,10 +59,10 @@ export function deepClone<T>(object: T): T {
 
 export const getEmptyPositions = (board: Board) => board.filter(p => p.piece === EMPTY);
 
-export function getPossibleMoves(board: Board): Array<Movement> {
+export function getPossibleMoves(board: Board, withPiece?: IntRange<0, 16>): Array<Move> {
     const emptyPositions = getEmptyPositions(board);
-    const availablePieces = getAvailablePieces(board);
-    const availableMoves: Array<Movement> = [];
+    const availablePieces = withPiece ? [withPiece] : getAvailablePieces(board);
+    const availableMoves: Array<Move> = [];
     emptyPositions.forEach(({ col, row }) => availablePieces.forEach(piece => availableMoves.push({ row, col, piece })));
     return availableMoves;
 }
@@ -78,7 +78,7 @@ export function getNextMove(depth: number = 3,
     // Base case: evaluate board
     if (depth === 0)
         return evaluateBoard(game.board);
-    debugger;
+
     // best move not set yet
     const possibleMoves = getPossibleMoves(game.board);
 
@@ -202,10 +202,38 @@ export let COUNTER = 0;
 
 export const DEPTH = 2;
 
-export function minimax(game: GameEngine, alpha: number, beta: number, maximizing_player: boolean, depth = DEPTH): [Movement | undefined, number] {
+export interface CanWin {
+    win: boolean;
+    move: Move | undefined;
+}
+
+export function canWin(board: Board, piece: IntRange<0, 16>): CanWin {
+    const possibleMoves = getPossibleMoves(board, piece);
+
+    return possibleMoves
+        .reduce((acc: CanWin, move) => {
+            if (acc.win) return acc;
+            else {
+                const clonedBoard = deepClone<Board>(board);
+                const position = clonedBoard.find((p: Position) => p.row === move.row && p.col === move.col);
+                clonedBoard.splice(clonedBoard.indexOf(position!), 1, { ...position, ...move } as Position);
+                return { win: gameWinner(clonedBoard), move: move };
+            }
+        }, { win: false, move: undefined });
+}
+
+export function nextMove(game: GameEngine, piece: IntRange<0, 16>) {
+    const { win, move } = canWin(game.board, piece);
+    return win ? move : minimax(game, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece)[0];
+}
+
+export function minimax(game: GameEngine, alpha: number, beta: number, maximizing_player: boolean, depth = DEPTH,
+    piece?: IntRange<0, 16>): [Move | undefined, number] {
     COUNTER++;
     // if terminal state (game over) or max depth (depth == 0)
     if (gameWinner(game.board) || gameDraw(game.board) || depth === 0) {
+        printBoard(game.board);
+
         return [undefined, evaluatePositions(game.board)];
     }
 
@@ -213,7 +241,8 @@ export function minimax(game: GameEngine, alpha: number, beta: number, maximizin
     if (maximizing_player) {
         // find move with the best possible score
         let maxEval = -Infinity;
-        let possibleMoves = getPossibleMoves(game.board);
+        let possibleMoves = getPossibleMoves(game.board, piece);
+        console.log('Possible moves', possibleMoves);
 
         for (let i = 0; i < possibleMoves.length; i++) {
             game.move(possibleMoves[i]);
