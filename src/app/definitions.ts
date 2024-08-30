@@ -28,6 +28,25 @@ import { NgtVector3 } from 'angular-three';
     0: 'Small Light Round No Hole', // 0000
 */
 
+export let COUNTER = 0;
+export const DEPTH = 2;
+export const WINNING_LINE_NAMES = ['Row 1', 'Row 2', 'Row 3', 'Row 4', 'Column 1', 'Column 2', 'Column 3', 'Column 4', 'Diagonal 1',
+                                   'Diagonal 2'] as const;
+export const EMPTY = -1;
+
+export const CharacteristicIndices = {
+    Size: 0,
+    Colour: 1,
+    Shape: 2,
+    Hole: 3
+};
+
+export interface CanWin {
+    win: boolean;
+    move: Move | undefined;
+    line: typeof WINNING_LINE_NAMES[number] | undefined;
+}
+
 export enum Size {
     Small = 0,
     Big = 1
@@ -60,6 +79,16 @@ export interface Piece {
     path: string;
     position: NgtVector3;
     characteristics: IntRange<0, 16>;
+}
+
+export function getPiece(size: Size, colour: Colour, shape: Shape, hole: Hole): IntRange<0, 16> {
+    const value = parseInt(`${ size }${ colour }${ shape }${ hole }`, 2);
+
+    if (value < 0 || value > 16) {
+        throw new Error('Invalid piece characteristics');
+    }
+
+    return value as IntRange<0, 16>;
 }
 
 export const PIECES: Piece[] = [
@@ -144,37 +173,6 @@ export const PIECES: Piece[] = [
         characteristics: getPiece(Size.Small, Colour.Light, Shape.Square, Hole.No)
     },
 ];
-
-export function getPiece(size: Size, colour: Colour, shape: Shape, hole: Hole): IntRange<0, 16> {
-    const value = parseInt(`${ size }${ colour }${ shape }${ hole }`, 2);
-
-    if (value < 0 || value > 16) {
-        throw new Error('Invalid piece characteristics');
-    }
-
-    return value as IntRange<0, 16>;
-}
-
-export function number2binary(number: number): string {
-    return (number >>> 0).toString(2).padStart(4, '0');
-}
-
-export const CharacteristicIndices = {
-    Size: 0,
-    Colour: 1,
-    Shape: 2,
-    Hole: 3
-};
-
-export function getSingleCharacteristic(piece: Piece, characteristic: 'Size' | 'Colour' | 'Shape' | 'Hole'): 0 | 1 {
-    const characteristicValue = Number(number2binary(piece.characteristics).at(CharacteristicIndices[characteristic])!);
-    if (characteristicValue !== 0 && characteristicValue !== 1) {
-        throw new Error('Invalid characteristic');
-    }
-    return characteristicValue as 0 | 1;
-}
-
-export const EMPTY = -1;
 
 export interface Position {
     row: IntRange<0, 4>;

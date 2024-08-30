@@ -2,7 +2,8 @@ import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject, input, signal, Sig
 import { extend, injectLoader, NgtArgs, NgtThreeEvent } from 'angular-three';
 import { Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
-import { getSingleCharacteristic, Piece } from './definitions';
+import { Piece } from './definitions';
+import { getSingleCharacteristic } from './game-engine';
 import { GameActions, GameStateMachine, GameStates } from './game-state-machine';
 
 type GLTFResult = GLTF & {

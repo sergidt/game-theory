@@ -1,5 +1,9 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { Board, EMPTY, IntRange, Move, number2binary, Position } from './definitions';
+import { Board, CanWin, CharacteristicIndices, DEPTH, EMPTY, IntRange, Move, Piece, Position, WINNING_LINE_NAMES } from './definitions';
+
+export function deepClone<T>(object: T): T {
+    return JSON.parse(JSON.stringify(object));
+}
 
 @Injectable({ providedIn: 'root' })
 export class GameEngine {
@@ -35,7 +39,7 @@ export class GameEngine {
      * The piece is provided in the position object.
      * @param move
      */
-    move(move: Move) {
+    move(move: Move) { // TODO: Use makeMove function
         this.#board = deepClone<Board>(this.#board);
         this.#board.find((p: Position) => p.row === move.row && p.col === move.col)!.piece = move.piece;
         this.#moves.set([...this.#moves(), move]);
@@ -53,82 +57,48 @@ export class GameEngine {
     }
 }
 
-export function deepClone<T>(object: T): T {
-    return JSON.parse(JSON.stringify(object));
-}
+export const getRows = (board: Board) => Array.from(new Array(4), (_, i) => board.slice(i * 4, i * 4 + 4));
+export const getColumns = (board: Board) => Array.from(new Array(4), (_, i) => [board[i], board[i + 4], board[i + 8], board[i + 12]]);
+export const getDiagonal1 = (board: Board) => [board[0], board[5], board[10], board[15]];
+export const getDiagonal2 = (board: Board) => [board[3], board[6], board[9], board[12]];
 
 export const getEmptyPositions = (board: Board) => board.filter(p => p.piece === EMPTY);
 
+export const getFilledPositions = (positions: Position[]) => positions.filter(p => p.piece !== EMPTY);
+
+export function number2binary(number: number): string {
+    return (number >>> 0).toString(2).padStart(4, '0');
+}
+
+export function getSingleCharacteristic(piece: Piece, characteristic: 'Size' | 'Colour' | 'Shape' | 'Hole'): 0 | 1 {
+    const characteristicValue = Number(number2binary(piece.characteristics).at(CharacteristicIndices[characteristic])!);
+    if (characteristicValue !== 0 && characteristicValue !== 1) {
+        throw new Error('Invalid characteristic');
+    }
+    return characteristicValue as 0 | 1;
+}
+
 export function getPossibleMoves(board: Board, withPiece?: IntRange<0, 16>): Array<Move> {
-    const emptyPositions = getEmptyPositions(board);
     const availablePieces = withPiece ? [withPiece] : getAvailablePieces(board);
     const availableMoves: Array<Move> = [];
-    emptyPositions.forEach(({ col, row }) => availablePieces.forEach(piece => availableMoves.push({ row, col, piece })));
+
+    getEmptyPositions(board)
+        .forEach(({ col, row }) => availablePieces.forEach(piece => availableMoves.push({ row, col, piece })));
+
     return availableMoves;
 }
 
-/*
-export function getNextMove(depth: number = 3,
-    game: GameEngine,
-    alpha = Number.NEGATIVE_INFINITY,
-    beta = Number.POSITIVE_INFINITY,
-    isMaximizingPlayer = true): number {
-    let bestMove = undefined;
-    return 1;
-    // Base case: evaluate board
-    if (depth === 0)
-        return evaluateBoard(game.board);
+const MATCHES = Array.from(new Array(4), (_, i) => new Array(i + 1).fill(1).join(''))
+                     .concat(Array.from(new Array(4), (_, i) => new Array(i + 1).fill('0').join('')));
 
-    // best move not set yet
-    const possibleMoves = getPossibleMoves(game.board);
-
-    // Set a default best move value
-    let bestMoveValue = isMaximizingPlayer ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
-    // Search through all possible moves
-    for (let i = 0; i < possibleMoves.length; i++) {
-        const move = possibleMoves[i];
-        // Make the move, but undo before exiting loop
-        game.move(move);
-        // Recursively get the value from this move
-        const value = getNextMove(depth - 1, game, alpha, beta, !isMaximizingPlayer);
-        // Log the value of this move
-        console.log(isMaximizingPlayer ? 'Max: ' : 'Min: ', depth, move, value,
-            bestMove, bestMoveValue);
-
-        if (isMaximizingPlayer) {
-            // Look for moves that maximize position
-            if (value > bestMoveValue) {
-                bestMoveValue = value;
-                bestMove = move;
-            }
-            alpha = Math.max(alpha, value);
-        } else {
-            // Look for moves that minimize position
-            if (value < bestMoveValue) {
-                bestMoveValue = value;
-                bestMove = move;
-            }
-            beta = Math.min(beta, value);
-        }
-        // Undo previous move
-        game.undo();
-        // Check for alpha beta pruning
-        if (beta <= alpha) {
-            console.log('Prune', alpha, beta);
-            break;
-        }
-    }
+export function evaluatePositions(positions: Position[]) {
+    const features = featuresByPosition(positions);
+    const coincidences = features.reduce((acc, cur) => acc + (MATCHES.includes(cur) ? 1 : 0), 0);
+    return coincidences ? coincidences * 10 : featuresByPosition.length * -10;
 }
 
- */
-
-const getRows = (board: Board) => Array.from(new Array(4), (_, i) => board.slice(i * 4, i * 4 + 4));
-const getColumns = (board: Board) => Array.from(new Array(4), (_, i) => [board[i], board[i + 4], board[i + 8], board[i + 12]]);
-const getDiagonal1 = (board: Board) => [board[0], board[5], board[10], board[15]];
-const getDiagonal2 = (board: Board) => [board[3], board[6], board[9], board[12]];
-
 export function evaluateBoard(board: Board): number {
-    if (gameWinner(board).winner) return 1000;
+    if (gameWinner(board).win) return 1000;
     else {
         const rows = getRows(board);
         const columns = getColumns(board);
@@ -140,15 +110,9 @@ export function evaluateBoard(board: Board): number {
     }
 }
 
-const MATCHES = Array.from(new Array(4), (_, i) => new Array(i + 1).fill(1).join(''))
-                     .concat(Array.from(new Array(4), (_, i) => new Array(i + 1).fill('0').join('')));
-
 export function featuresByPosition(positions: Position[]) {
-    const filledPositions = positions.filter(p => p.piece !== EMPTY);
+    const filledPositions = getFilledPositions(positions);
     const concatenated = filledPositions.map(p => number2binary(p.piece)).join('');
-    //  if (filledPositions.length === 4)
-    //      console.log('positions', positions, concatenated);
-
     const featuresByPosition = [];
 
     for (let i = 0; i < 4; i++) {
@@ -158,16 +122,7 @@ export function featuresByPosition(positions: Position[]) {
         }
         featuresByPosition.push(chars);
     }
-    //  if (filledPositions.length === 4)
-    //      console.log('>>>', featuresByPosition);
-
     return featuresByPosition;
-}
-
-function evaluatePositions(positions: Position[]) {
-    const features = featuresByPosition(positions);
-    const coincidences = features.reduce((acc, cur) => acc + (MATCHES.includes(cur) ? 1 : 0), 0);
-    return coincidences ? coincidences * 10 : featuresByPosition.length * -10;
 }
 
 export function getAvailablePieces(board: Board): Array<IntRange<0, 16>> {
@@ -178,8 +133,9 @@ export function getAvailablePieces(board: Board): Array<IntRange<0, 16>> {
 }
 
 export interface WinningLine {
-    winner: boolean;
+    win: boolean;
     positions: Position[];
+    line: typeof WINNING_LINE_NAMES[number] | undefined;
 }
 
 export function gameWinner(board: Board): WinningLine {
@@ -187,24 +143,28 @@ export function gameWinner(board: Board): WinningLine {
     const columns = getColumns(board);
     const diagonal1 = getDiagonal1(board);
     const diagonal2 = getDiagonal2(board);
-    return rows.concat(columns).concat([diagonal1], [diagonal2])
-               .reduce((acc: WinningLine, line: Position[]) => {
-                   if (acc.winner) {
-                       return acc as WinningLine;
-                   } else {
-                       const features = featuresByPosition(line);
+    const winningLines = rows.concat(columns).concat([diagonal1], [diagonal2]);
 
-                       if (features.includes('1111') || features.includes('0000')) {
-                           return { winner: true, positions: line };
-                       } else {
-                           return acc as WinningLine;
-                       }
-                   }
-               }, { winner: false, positions: [] });
+    return winningLines
+        .reduce((acc: WinningLine, line: Position[], currentIndex) => {
+            if (acc.win) {
+                return acc as WinningLine;
+            } else {
+                const features = featuresByPosition(getFilledPositions(line));
+                if (features[0].length === 4) { // Skip lines with less than 4, that means not all pieces are placed in the line
+
+                    return (features.includes('1111') || features.includes('0000')) // Winning line must have 4 pieces with some characteristic in common
+                        ? { win: true, positions: line, line: WINNING_LINE_NAMES[currentIndex] }
+                        : acc as WinningLine;
+                } else {
+                    return acc as WinningLine;
+                }
+            }
+        }, { win: false, positions: [], line: undefined });
 }
 
 export function gameDraw(board: Board): boolean {
-    return board.every(p => p.piece !== EMPTY) && !gameWinner(board).winner;
+    return board.every(p => p.piece !== EMPTY) && !gameWinner(board).win;
 }
 
 export function printBoard(board: Board) {
@@ -214,29 +174,22 @@ export function printBoard(board: Board) {
     );
 }
 
-export let COUNTER = 0;
-
-export const DEPTH = 2;
-
-export interface CanWin {
-    win: boolean;
-    move: Move | undefined;
+export function makeMove(board: Board, move: Move): Board {
+    const clonedBoard = deepClone<Board>(board);
+    const position = clonedBoard.find((p: Position) => p.row === move.row && p.col === move.col);
+    clonedBoard.splice(clonedBoard.indexOf(position!), 1, { ...position, ...move } as Position);
+    return clonedBoard;
 }
 
 export function canWin(board: Board, piece: IntRange<0, 16>): CanWin {
-    const possibleMoves = getPossibleMoves(board, piece);
-
-    return possibleMoves
+    return getPossibleMoves(board, piece)
         .reduce((acc: CanWin, move) => {
             if (acc.win) return acc;
             else {
-                const clonedBoard = deepClone<Board>(board);
-                const position = clonedBoard.find((p: Position) => p.row === move.row && p.col === move.col);
-                clonedBoard.splice(clonedBoard.indexOf(position!), 1, { ...position, ...move } as Position);
-                const win = gameWinner(clonedBoard).winner;
-                return { win, move: win ? move : acc.move };
+                const { win, line } = gameWinner(makeMove(board, move));
+                return { win, move: win ? move : acc.move, line };
             }
-        }, { win: false, move: undefined });
+        }, { win: false, move: undefined, line: undefined });
 }
 
 export function nextMove(game: GameEngine, piece: IntRange<0, 16>) {
@@ -244,29 +197,28 @@ export function nextMove(game: GameEngine, piece: IntRange<0, 16>) {
     return win ? move : minimax(game, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece)[0];
 }
 
-export function minimax(game: GameEngine, alpha: number, beta: number, maximizing_player: boolean, depth = DEPTH,
+export function minimax(game: GameEngine, alpha: number, beta: number, maximizingPlayer: boolean, depth = DEPTH,
     piece?: IntRange<0, 16>): [Move | undefined, number] {
-    COUNTER++;
     // if terminal state (game over) or max depth (depth == 0)
-    if (gameWinner(game.board).winner || gameDraw(game.board) || depth === 0) {
-        printBoard(game.board);
-
+    if (gameWinner(game.board).win || gameDraw(game.board) || depth === 0) {
+        // printBoard(game.board);
         return [undefined, evaluatePositions(game.board)];
     }
 
     let bestMove;
-    if (maximizing_player) {
+    let value: number;
+    if (maximizingPlayer) {
         // find move with the best possible score
-        let maxEval = -Infinity;
+        value = -Infinity;
         let possibleMoves = getPossibleMoves(game.board, piece);
         console.log('Possible moves', possibleMoves);
 
         for (let i = 0; i < possibleMoves.length; i++) {
             game.move(possibleMoves[i]);
             let [childBestMove, childEval] = minimax(game, alpha, beta, false, depth - 1);
-            if (childEval > maxEval) {
+            if (childEval > value) {
                 console.log(1);
-                maxEval = childEval;
+                value = childEval;
                 bestMove = possibleMoves[i];
             }
             game.undo();
@@ -279,19 +231,19 @@ export function minimax(game: GameEngine, alpha: number, beta: number, maximizin
                 break;
             }
         }
-        return [bestMove, maxEval];
+        return [bestMove, value];
 
     } else {
         // find move with the worst possible score (for maximizer)
-        let minEval = +Infinity;
+        value = +Infinity;
         let possibleMoves = getPossibleMoves(game.board);
         for (let i = 0; i < possibleMoves.length; i++) {
 
             game.move(possibleMoves[i]);
             let [childBestMove, childEval] = minimax(game, alpha, beta, true, depth - 1);
-            if (childEval < minEval) {
+            if (childEval < value) {
                 console.log(2);
-                minEval = childEval;
+                value = childEval;
                 bestMove = possibleMoves[i];
             }
             game.undo();
@@ -304,7 +256,7 @@ export function minimax(game: GameEngine, alpha: number, beta: number, maximizin
                 break;
             }
         }
-        return [bestMove, minEval];
+        return [bestMove, value];
     }
 }
 
