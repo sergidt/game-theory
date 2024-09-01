@@ -190,11 +190,6 @@ export function canWin(board: Board, piece: IntRange<0, 16>): CanWin {
     }, { win: false, move: undefined, line: undefined });
 }
 
-export function nextMove(game: GameEngine, piece: IntRange<0, 16>) {
-  const { win, move } = canWin(game.board, piece);
-  return win ? move : minimax(game, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece)[0];
-}
-
 export function minimax(game: GameEngine, alpha: number, beta: number, maximizingPlayer: boolean, depth = DEPTH,
   piece?: IntRange<0, 16>): [Move | undefined, number] {
   let bestMove: Move | undefined = undefined;
