@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
-import { extend, injectLoader, NgtArgs, NgtGroup, NgtSelection, NgtVector3 } from 'angular-three';
+import { extend, injectLoader, NgtArgs, NgtSelection, NgtVector3 } from 'angular-three';
 import { NgtsCameraControls, NgtsOrbitControls } from 'angular-three-soba/controls';
 import { NgtsEnvironment } from 'angular-three-soba/staging';
-import * as THREE from 'three';
 import { AmbientLight, Mesh, MeshStandardMaterial, ShapeGeometry, TorusGeometry } from 'three';
 import { GLTFLoader } from 'three-stdlib';
 import { PIECES } from './definitions';
@@ -11,13 +10,12 @@ import { GamePieceComponent } from './game-piece.component';
 extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry, AmbientLight });
 
 @Component({
-    selector: 'board',
-    standalone: true,
-    template: `
+  selector: 'board',
+  standalone: true,
+  template: `
       <ngt-ambient-light [intensity]="1"/>
-
       <ngt-group #group
-                 [parameters]="{scale: 0.020, rotation: [Math.PI / 2, Math.PI  , Math.PI / 3.5]}">
+                 [parameters]="{scale: 0.020, rotation: [1.57, 3.14, 0.93]}">
         <ngt-primitive #board
                        *args="[board()?.scene]"/>
 
@@ -42,29 +40,29 @@ extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry, AmbientLight 
       <ngts-orbit-controls/>
       <ngts-environment [options]="{preset: 'city'}"/>
     `,
-    imports: [NgtArgs, NgtsOrbitControls, NgtsEnvironment, NgtSelection, NgtsCameraControls, GamePieceComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgtArgs, NgtsOrbitControls, NgtsEnvironment, NgtSelection, NgtsCameraControls, GamePieceComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Board {
-    pieces = PIECES;
-    Math = Math;
+  pieces = PIECES;
+  Math = Math;
 
-    torusPositions: Array<NgtVector3> = [];
+  torusPositions: Array<NgtVector3> = [];
 
-    torusIndexHovered = signal(-1);
+  torusIndexHovered = signal(-1);
 
-    torusGeometryArgs = [17, 1.8, 100, 100];
+  torusGeometryArgs = [17, 1.8, 100, 100];
 
-    board = injectLoader(
-        () => GLTFLoader, () => '/assets/board.glb',
-        {
-            onLoad: ({ scene }: { scene: NgtGroup }) => {
-                if (scene['add'] !== undefined) {
-                    scene.add(new THREE.AxesHelper(200));
-                }
-            }
-        }
-    );
+  board = injectLoader(
+    () => GLTFLoader, () => '/assets/board.glb',
+    {
+      //  onLoad: ({ scene }: { scene: NgtGroup }) => {
+      //    if (scene['add'] !== undefined) {
+      //      scene.add(new THREE.AxesHelper(200));
+      //    }
+      //  }
+    }
+  );
 }
 

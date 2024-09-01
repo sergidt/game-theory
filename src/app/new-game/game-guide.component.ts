@@ -1,23 +1,21 @@
 import { Component, inject } from '@angular/core';
-import { GameActions, GameStateMachine } from '../game-state-machine';
+import { GameActions, GameStateMachine } from '../state-machine';
 import { CpuPiecePlacingComponent } from './cpu-piece-placing.component';
 import { CpuPieceSelectionComponent } from './cpu-piece-selection.component';
 import { UserPiecePlacingComponent } from './user-piece-placing.component';
 import { UserPieceSelectionComponent } from './user-piece-selection.component';
 
 @Component({
-    selector: 'new-game',
-    standalone: true,
-    imports: [
-        UserPieceSelectionComponent,
-        CpuPieceSelectionComponent,
-        UserPiecePlacingComponent,
-        CpuPiecePlacingComponent,
-    ],
-    template: `
+  selector: 'game-guide',
+  standalone: true,
+  imports: [
+    UserPieceSelectionComponent,
+    CpuPieceSelectionComponent,
+    UserPiecePlacingComponent,
+    CpuPiecePlacingComponent,
+  ],
+  template: `
       <h2>Game guide</h2>
-
-      <span>(playing? {{ gameStateMachine.playing() }})</span>
 
       @switch (gameStateMachine.currentState()) {
         @case ('NewGame') {
@@ -40,14 +38,14 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
           <div>Congratulations! You win!</div>
         }
         @case ('CPUWins') {
-          <div>Sorry! You lose!</div>
+          <div>Sorry, You lose!</div>
         }
         @default {
           <div>It's a draw!</div>
         }
       }
     `,
-    styles: `
+  styles: `
       :host {
         display: flex;
         flex-direction: column;
@@ -56,6 +54,6 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
     `
 })
 export class GameGuideComponent {
-    protected readonly gameStateMachine = inject(GameStateMachine);
-    protected readonly GameActions = GameActions;
+  protected readonly gameStateMachine = inject(GameStateMachine);
+  protected readonly GameActions = GameActions;
 }

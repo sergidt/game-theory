@@ -3,27 +3,27 @@ import { extend, injectLoader, NgtArgs, NgtThreeEvent } from 'angular-three';
 import { Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
 import { Piece } from './definitions';
-import { getSingleCharacteristic } from './game-engine';
-import { GameActions, GameStateMachine, GameStates } from './game-state-machine';
+import { getSingleCharacteristic } from './game.utils';
+import { GameActions, GameStateMachine, GameStates } from './state-machine';
 
 type GLTFResult = GLTF & {
-    nodes: {
-        imagetostl_mesh0: Mesh
-    }
-    materials: {
-        mat0: MeshStandardMaterial
-    }
+  nodes: {
+    imagetostl_mesh0: Mesh
+  }
+  materials: {
+    mat0: MeshStandardMaterial
+  }
 }
 
-const DarkColor = '#1d3557';
-const LightColor = '#eacdc2';
+const DarkColor = '#2F5CBB';
+const LightColor = '#ffe7e2';
 
 extend({ Mesh, MeshPhysicalMaterial });
 
 @Component({
-    selector: 'game-piece',
-    standalone: true,
-    template: `
+  selector: 'game-piece',
+  standalone: true,
+  template: `
       @if (gltf(); as gltf) {
         <ngt-group [dispose]="null">
           <ngt-mesh [parameters]="position()"
@@ -42,42 +42,42 @@ extend({ Mesh, MeshPhysicalMaterial });
         </ngt-group>
       }
     `,
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    imports: [NgtArgs],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [NgtArgs],
 })
 export class GamePieceComponent {
-    piece = input.required<Piece>();
+  piece = input.required<Piece>();
 
-    protected gameStateMachine = inject(GameStateMachine);
+  protected gameStateMachine = inject(GameStateMachine);
 
-    protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
+  protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
 
-    protected highlighted = signal(false);
+  protected highlighted = signal(false);
 
-    protected selected = computed(() => this.piece().characteristics === this.gameStateMachine.selectedPiece());
-    protected position = computed(() => ({ position: this.piece().position }));
-    protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
-    protected readonly console = console;
+  protected selected = computed(() => this.piece().characteristics === this.gameStateMachine.selectedPiece());
+  protected position = computed(() => ({ position: this.piece().position }));
+  protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
+  protected readonly console = console;
 
-    pointerOver(event: NgtThreeEvent<PointerEvent>) {
-        if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
-            event.stopPropagation();
-            this.highlighted.set(true);
-        }
+  pointerOver(event: NgtThreeEvent<PointerEvent>) {
+    if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
+      event.stopPropagation();
+      this.highlighted.set(true);
     }
+  }
 
-    pointerOut(event: NgtThreeEvent<PointerEvent>) {
-        if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
-            event.stopPropagation();
-            this.highlighted.set(false);
-        }
+  pointerOut(event: NgtThreeEvent<PointerEvent>) {
+    if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
+      event.stopPropagation();
+      this.highlighted.set(false);
     }
+  }
 
-    clicked(event: NgtThreeEvent<MouseEvent>) {
-        if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
-            event.stopPropagation();
-            this.gameStateMachine.toggleSelection(this.piece().characteristics);
-            this.gameStateMachine.nextState(GameActions.PieceSelected);
-        }
+  clicked(event: NgtThreeEvent<MouseEvent>) {
+    if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
+      event.stopPropagation();
+      this.gameStateMachine.toggleSelection(this.piece().characteristics);
+      this.gameStateMachine.nextState(GameActions.PieceSelected);
     }
+  }
 }
