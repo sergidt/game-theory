@@ -60,21 +60,21 @@ export class GamePieceComponent {
   protected readonly console = console;
 
   pointerOver(event: NgtThreeEvent<PointerEvent>) {
-    if (this.game.currentState() === GameStates.UserSelectsPiece) {
+    if (this.game.currentState() === GameStates.UserSelectingPiece) {
       event.stopPropagation();
       this.highlighted.set(true);
     }
   }
 
   pointerOut(event: NgtThreeEvent<PointerEvent>) {
-    if (this.game.currentState() === GameStates.UserSelectsPiece) {
+    if (this.game.currentState() === GameStates.UserSelectingPiece) {
       event.stopPropagation();
       this.highlighted.set(false);
     }
   }
 
   clicked(event: NgtThreeEvent<MouseEvent>) {
-    if (this.game.currentState() === GameStates.UserSelectsPiece) {
+    if (this.game.currentState() === GameStates.UserSelectingPiece) {
       event.stopPropagation();
       this.game.toggleSelection(this.piece().characteristics);
       this.game.nextState(GameActions.PieceSelected);

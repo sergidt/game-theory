@@ -74,28 +74,28 @@ export class GameEngine {
 
   #allowedTransitions: GameStateTransitions = {
     [GameStates.NewGame]: {
-      [GameActions.Ready]: GameStates.UserSelectsPiece
+      [GameActions.Ready]: GameStates.UserSelectingPiece
     },
-    [GameStates.UserSelectsPiece]: {
-      [GameActions.PieceSelected]: GameStates.CPUPlacesPiece
+    [GameStates.UserSelectingPiece]: {
+      [GameActions.PieceSelected]: GameStates.CPUPlacingPiece
     },
-    [GameStates.CPUPlacesPiece]: {
-      [GameActions.PiecePlaced]: GameStates.CPUSelectsPiece,
-      [GameActions.WinnerPiece]: GameStates.CPUWins,
+    [GameStates.CPUPlacingPiece]: {
+      [GameActions.PiecePlaced]: GameStates.CPUSelectingPiece,
+      [GameActions.WinnerPiece]: GameStates.CPUWon,
       [GameActions.DrawPiece]: GameStates.Draw
     },
-    [GameStates.CPUSelectsPiece]: {
-      [GameActions.PieceSelected]: GameStates.UserPlacesPiece
+    [GameStates.CPUSelectingPiece]: {
+      [GameActions.PieceSelected]: GameStates.UserPlacingPiece
     },
-    [GameStates.UserPlacesPiece]: {
-      [GameActions.PiecePlaced]: GameStates.UserSelectsPiece,
-      [GameActions.WinnerPiece]: GameStates.UserWins,
+    [GameStates.UserPlacingPiece]: {
+      [GameActions.PiecePlaced]: GameStates.UserSelectingPiece,
+      [GameActions.WinnerPiece]: GameStates.UserWon,
       [GameActions.DrawPiece]: GameStates.Draw
     },
-    [GameStates.UserWins]: {
+    [GameStates.UserWon]: {
       [GameActions.PlayAgain]: GameStates.NewGame
     },
-    [GameStates.CPUWins]: {
+    [GameStates.CPUWon]: {
       [GameActions.PlayAgain]: GameStates.NewGame
     },
     [GameStates.Draw]: {

@@ -196,12 +196,12 @@ export type Board = [
 
 export enum GameStates {
   NewGame = 'NewGame',
-  UserSelectsPiece = 'UserSelectsPiece',
-  UserPlacesPiece = 'UserPlacesPiece',
-  CPUSelectsPiece = 'CPUSelectsPiece',
-  CPUPlacesPiece = 'CPUPlacesPiece',
-  UserWins = 'UserWins',
-  CPUWins = 'CPUWins',
+  UserSelectingPiece = 'UserSelectingPiece',
+  UserPlacingPiece = 'UserPlacingPiece',
+  CPUSelectingPiece = 'CPUSelectingPiece',
+  CPUPlacingPiece = 'CPUPlacingPiece',
+  UserWon = 'UserWon',
+  CPUWon = 'CPUWon',
   Draw = 'Draw'
 }
 
