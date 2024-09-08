@@ -1,6 +1,7 @@
 import { computed, Injectable, signal, WritableSignal } from '@angular/core';
 import { Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, IntRange, Move, Position } from './definitions';
-import { deepClone, evaluateBoard, gameDraw, gameWinner, getPossibleMoves } from './game.utils';
+import { deepClone } from './game.utils';
+import { minimax } from './minimax';
 
 
 @Injectable({ providedIn: 'root' })
@@ -34,8 +35,8 @@ export class GameEngine {
 
   moves = (): Move[] => this.#moves();
 
-  cpuPlacePiece(piece: IntRange<0, 16>) {
-    const [move, value] = minimax(this, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece);
+  async cpuPlacePiece(piece: IntRange<0, 16>) {
+    const [move, value] = await minimax(this, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece);
   }
 
 
@@ -73,28 +74,28 @@ export class GameEngine {
 
   #allowedTransitions: GameStateTransitions = {
     [GameStates.NewGame]: {
-      [GameActions.Ready]: GameStates.UserSelectsPiece
+      [GameActions.Ready]: GameStates.UserSelectingPiece
     },
-    [GameStates.UserSelectsPiece]: {
-      [GameActions.PieceSelected]: GameStates.CPUPlacesPiece
+    [GameStates.UserSelectingPiece]: {
+      [GameActions.PieceSelected]: GameStates.CPUPlacingPiece
     },
-    [GameStates.CPUPlacesPiece]: {
-      [GameActions.PiecePlaced]: GameStates.CPUSelectsPiece,
-      [GameActions.WinnerPiece]: GameStates.CPUWins,
+    [GameStates.CPUPlacingPiece]: {
+      [GameActions.PiecePlaced]: GameStates.CPUSelectingPiece,
+      [GameActions.WinnerPiece]: GameStates.CPUWon,
       [GameActions.DrawPiece]: GameStates.Draw
     },
-    [GameStates.CPUSelectsPiece]: {
-      [GameActions.PieceSelected]: GameStates.UserPlacesPiece
+    [GameStates.CPUSelectingPiece]: {
+      [GameActions.PieceSelected]: GameStates.UserPlacingPiece
     },
-    [GameStates.UserPlacesPiece]: {
-      [GameActions.PiecePlaced]: GameStates.UserSelectsPiece,
-      [GameActions.WinnerPiece]: GameStates.UserWins,
+    [GameStates.UserPlacingPiece]: {
+      [GameActions.PiecePlaced]: GameStates.UserSelectingPiece,
+      [GameActions.WinnerPiece]: GameStates.UserWon,
       [GameActions.DrawPiece]: GameStates.Draw
     },
-    [GameStates.UserWins]: {
+    [GameStates.UserWon]: {
       [GameActions.PlayAgain]: GameStates.NewGame
     },
-    [GameStates.CPUWins]: {
+    [GameStates.CPUWon]: {
       [GameActions.PlayAgain]: GameStates.NewGame
     },
     [GameStates.Draw]: {
@@ -118,47 +119,4 @@ export class GameEngine {
     this.currentState.set(nextState);
   }
 }
-
-export function minimax(game: GameEngine, alpha: number, beta: number, maximizingPlayer: boolean, depth = DEPTH, piece?: IntRange<0, 16>): [Move | undefined, number] {
-  let bestMove: Move | undefined = undefined;
-
-  // if terminal state (game over) or max depth (depth == 0)
-  if (gameWinner(game.board).win || gameDraw(game.board) || depth === 0) {
-    return [bestMove, evaluateBoard(game.board)];
-  }
-
-  let value = maximizingPlayer ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
-
-  const possibleMoves = getPossibleMoves(game.board, piece);
-
-  for (let i = 0; i < possibleMoves.length; i++) {
-    game.move(possibleMoves[i]);
-
-    const [_, childEval] = minimax(game, alpha, beta, !maximizingPlayer, depth - 1);
-
-    if (maximizingPlayer) {
-      if (childEval > value) {
-        value = childEval;
-        bestMove = possibleMoves[i];
-      }
-
-      alpha = Math.max(alpha, childEval);
-    } else {
-      if (childEval < value) {
-        value = childEval;
-        bestMove = possibleMoves[i];
-      }
-
-      beta = Math.min(beta, childEval);
-    }
-    game.undo();
-
-    if (beta <= alpha) {
-      break;
-    }
-  }
-  return [bestMove, value];
-}
-
-
 

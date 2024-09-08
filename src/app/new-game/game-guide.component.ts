@@ -23,22 +23,22 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
           <div>Are you ready to start a new game?</div>
           <button (click)="game.nextState(GameActions.Ready)">Ready!</button>
         }
-        @case ('UserSelectsPiece') {
+        @case ('UserSelectingPiece') {
           <user-piece-selection/>
         }
-        @case ('CPUSelectsPiece') {
+        @case ('CPUSelectingPiece') {
           <cpu-piece-selection/>
         }
-        @case ('UserPlacesPiece') {
+        @case ('UserPlacingPiece') {
           <user-piece-placing/>
         }
-        @case ('CPUPlacesPiece') {
+        @case ('CPUPlacingPiece') {
           <cpu-piece-placing/>
         }
-        @case ('UserWins') {
+        @case ('UserWon') {
           <div>Congratulations! You win!</div>
         }
-        @case ('CPUWins') {
+        @case ('CPUWon') {
           <div>Sorry, You lose!</div>
         }
         @default {

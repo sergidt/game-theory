@@ -6,7 +6,8 @@ import { Board } from './board.component';
 import { DEPTH } from './definitions';
 import { GameDialogComponent } from './dialog.component';
 import { GameDescriptionComponent } from './game-description.component';
-import { GameEngine, minimax } from './game-engine';
+import { GameEngine } from './game-engine';
+import { minimaxPromisified } from './minimax';
 import { GameGuideComponent } from './new-game/game-guide.component';
 
 @Component({
@@ -69,8 +70,12 @@ export class AppComponent {
   #game = inject(GameEngine);
 
   constructor() {
+    this.init();
+  }
+
+  async init() {
     console.time('minimax');
-    const value = minimax(this.#game, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, 8);
+    const value = await minimaxPromisified(this.#game, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, 8);
     console.timeEnd('minimax');
     console.log('Minimax', value);
   }
