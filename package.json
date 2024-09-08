@@ -20,7 +20,6 @@
     "@angular/router": "^18.1.0",
     "@monogrid/gainmap-js": "3.0.6",
     "@pmndrs/vanilla": "^1.19.1",
-    "@tweenjs/tween.js": "^25.0.0",
     "angular-three": "2.0.0",
     "angular-three-soba": "2.0.0",
     "animejs": "^3.2.2",

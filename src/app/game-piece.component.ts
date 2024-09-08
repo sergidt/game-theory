@@ -17,6 +17,7 @@ type GLTFResult = GLTF & {
 
 const DarkColor = '#2F5CBB';
 const LightColor = '#ffe7e2';
+const SelectionColor = '#ff9e42';
 
 extend({ Mesh, MeshPhysicalMaterial });
 
@@ -33,7 +34,7 @@ extend({ Mesh, MeshPhysicalMaterial });
                     (click)="clicked($event)"
                     (pointerover)="pointerOver($event)"
                     (pointerout)="pointerOut($event)">
-            <ngt-mesh-physical-material [color]="selected() ? 'red' : highlighted() ? '#ff9e42' : color()"
+            <ngt-mesh-physical-material [color]="selected() ? 'red' : highlighted() ? SelectionColor : color()"
                                         [metalness]="0.8"
                                         [roughness]="0.8"
                                         [clearcoat]="0.67"
@@ -51,6 +52,8 @@ export class GamePieceComponent {
   protected game = inject(GameEngine);
 
   protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
+
+  SelectionColor = SelectionColor;
 
   protected highlighted = signal(false);
 

@@ -1,13 +1,15 @@
-import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal } from '@angular/core';
 import { extend, injectLoader, NgtArgs, NgtSelection, NgtVector3 } from 'angular-three';
 import { NgtsCameraControls, NgtsOrbitControls } from 'angular-three-soba/controls';
 import { NgtsEnvironment } from 'angular-three-soba/staging';
-import { AmbientLight, Mesh, MeshStandardMaterial, ShapeGeometry, TorusGeometry } from 'three';
+import { AmbientLight, CylinderGeometry, Mesh, MeshStandardMaterial, ShapeGeometry } from 'three';
 import { GLTFLoader } from 'three-stdlib';
 import { PIECES } from './definitions';
+import { GameEngine } from './game-engine';
 import { GamePieceComponent } from './game-piece.component';
+import { getEmptyPositions } from './game.utils';
 
-extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry, AmbientLight });
+extend({ Mesh, ShapeGeometry, MeshStandardMaterial, CylinderGeometry, AmbientLight });
 
 @Component({
   selector: 'board',
@@ -25,16 +27,18 @@ extend({ Mesh, ShapeGeometry, MeshStandardMaterial, TorusGeometry, AmbientLight 
           }
         </ngt-group>
 
+        @if (showAvailablePositions()) {
         <ngt-group>
           @for (position of torusPositions; track $index; let i = $index) {
-            <ngt-mesh [parameters]="{rotation: [Math.PI / 2, 0, 0], position}"
+            <ngt-mesh [parameters]="{rotation: [0, 0, 0], position}"
                       (pointerover)="torusIndexHovered.set(i)"
                       (pointerout)="torusIndexHovered.set(-1)">
               <ngt-mesh-standard-material [color]="torusIndexHovered() === i ? 'indianred': 'white'"/>
-              <ngt-torus-geometry *args="torusGeometryArgs"/>
+              <ngt-cylinder-geometry *args="torusGeometryArgs"/>
             </ngt-mesh>
           }
         </ngt-group>
+        }
       </ngt-group>
 
       <ngts-orbit-controls/>
@@ -48,11 +52,15 @@ export class Board {
   pieces = PIECES;
   Math = Math;
 
-  torusPositions: Array<NgtVector3> = [];
+  game = inject(GameEngine);
+
+  showAvailablePositions = signal(true);
+
+  torusPositions: Array<NgtVector3> = getEmptyPositions(this.game.board).map(p => p.coords);
 
   torusIndexHovered = signal(-1);
 
-  torusGeometryArgs = [17, 1.8, 100, 100];
+  torusGeometryArgs = [17, 17, 10, 100];
 
   board = injectLoader(
     () => GLTFLoader, () => '/assets/board.glb',
