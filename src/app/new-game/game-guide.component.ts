@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { GameActions, GameStateMachine } from '../state-machine';
+import { GameActions } from '../definitions';
+import { GameEngine } from '../game-engine';
 import { CpuPiecePlacingComponent } from './cpu-piece-placing.component';
 import { CpuPieceSelectionComponent } from './cpu-piece-selection.component';
 import { UserPiecePlacingComponent } from './user-piece-placing.component';
@@ -16,11 +17,11 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
   ],
   template: `
       <h2>Game guide</h2>
-
-      @switch (gameStateMachine.currentState()) {
+<div>{{game.currentState()}}</div>
+      @switch (game.currentState()) {
         @case ('NewGame') {
           <div>Are you ready to start a new game?</div>
-          <button (click)="gameStateMachine.nextState(GameActions.Ready)">Ready!</button>
+          <button (click)="game.nextState(GameActions.Ready)">Ready!</button>
         }
         @case ('UserSelectsPiece') {
           <user-piece-selection/>
@@ -54,6 +55,6 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
     `
 })
 export class GameGuideComponent {
-  protected readonly gameStateMachine = inject(GameStateMachine);
+  protected readonly game = inject(GameEngine);
   protected readonly GameActions = GameActions;
 }

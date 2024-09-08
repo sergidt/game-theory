@@ -1,5 +1,6 @@
 import { Board, EMPTY, Move } from './definitions';
-import { deepClone, GameEngine, getAvailablePieces, getEmptyPositions, getPossibleMoves } from './game-engine';
+import { GameEngine } from './game-engine';
+import { deepClone, getAvailablePieces, getEmptyPositions, getPossibleMoves } from './game.utils';
 
 describe('Game Engine', () => {
   let engine: GameEngine;

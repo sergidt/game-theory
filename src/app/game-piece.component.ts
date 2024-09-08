@@ -2,9 +2,9 @@ import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject, input, signal, Sig
 import { extend, injectLoader, NgtArgs, NgtThreeEvent } from 'angular-three';
 import { Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
-import { Piece } from './definitions';
+import { GameActions, GameStates, Piece, } from './definitions';
+import { GameEngine } from './game-engine';
 import { getSingleCharacteristic } from './game.utils';
-import { GameActions, GameStateMachine, GameStates } from './state-machine';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -48,36 +48,36 @@ extend({ Mesh, MeshPhysicalMaterial });
 export class GamePieceComponent {
   piece = input.required<Piece>();
 
-  protected gameStateMachine = inject(GameStateMachine);
+  protected game = inject(GameEngine);
 
   protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
 
   protected highlighted = signal(false);
 
-  protected selected = computed(() => this.piece().characteristics === this.gameStateMachine.selectedPiece());
+  protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece());
   protected position = computed(() => ({ position: this.piece().position }));
   protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
   protected readonly console = console;
 
   pointerOver(event: NgtThreeEvent<PointerEvent>) {
-    if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
+    if (this.game.currentState() === GameStates.UserSelectsPiece) {
       event.stopPropagation();
       this.highlighted.set(true);
     }
   }
 
   pointerOut(event: NgtThreeEvent<PointerEvent>) {
-    if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
+    if (this.game.currentState() === GameStates.UserSelectsPiece) {
       event.stopPropagation();
       this.highlighted.set(false);
     }
   }
 
   clicked(event: NgtThreeEvent<MouseEvent>) {
-    if (this.gameStateMachine.currentState() === GameStates.UserSelectsPiece) {
+    if (this.game.currentState() === GameStates.UserSelectsPiece) {
       event.stopPropagation();
-      this.gameStateMachine.toggleSelection(this.piece().characteristics);
-      this.gameStateMachine.nextState(GameActions.PieceSelected);
+      this.game.toggleSelection(this.piece().characteristics);
+      this.game.nextState(GameActions.PieceSelected);
     }
   }
 }

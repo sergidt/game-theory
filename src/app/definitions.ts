@@ -191,3 +191,34 @@ export type Board = [
 ];
 
 
+
+// GAME STATE MACHINE DEFINITIONS
+
+export enum GameStates {
+  NewGame = 'NewGame',
+  UserSelectsPiece = 'UserSelectsPiece',
+  UserPlacesPiece = 'UserPlacesPiece',
+  CPUSelectsPiece = 'CPUSelectsPiece',
+  CPUPlacesPiece = 'CPUPlacesPiece',
+  UserWins = 'UserWins',
+  CPUWins = 'CPUWins',
+  Draw = 'Draw'
+}
+
+export enum GameActions {
+  Ready = 'Ready',
+  PieceSelected = 'PieceSelected',
+  PiecePlaced = 'PiecePlaced',
+  WinnerPiece = 'WinnerPiece',
+  DrawPiece = 'DrawPiece',
+  PlayAgain = 'PlayAgain'
+}
+
+export type GameState = keyof typeof GameStates;
+export type GameAction = keyof typeof GameActions;
+
+export type GameStateTransitions = {
+  [state in GameState]: {
+    [action in GameAction]?: GameState;
+  }
+}
