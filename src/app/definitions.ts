@@ -190,8 +190,6 @@ export type Board = [
   Position, Position, Position, Position,
 ];
 
-
-
 // GAME STATE MACHINE DEFINITIONS
 
 export enum GameStates {
