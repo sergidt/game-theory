@@ -81,3 +81,17 @@ export class GamePieceComponent {
     }
   }
 }
+
+
+/*
+    anime({
+        targets: [event.object.position],
+        z: 57,
+        y: 0,
+        easing: "easeInQuad",
+        duration: 1000,
+        direction: "normal",
+      });
+*/
+
+

@@ -1,6 +1,7 @@
 import { computed, Injectable, signal, WritableSignal } from '@angular/core';
 import { Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, IntRange, Move, Position } from './definitions';
-import { deepClone, evaluateBoard, gameDraw, gameWinner, getPossibleMoves } from './game.utils';
+import { deepClone } from './game.utils';
+import { minimax } from './minimax';
 
 
 @Injectable({ providedIn: 'root' })
@@ -34,8 +35,8 @@ export class GameEngine {
 
   moves = (): Move[] => this.#moves();
 
-  cpuPlacePiece(piece: IntRange<0, 16>) {
-    const [move, value] = minimax(this, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece);
+  async cpuPlacePiece(piece: IntRange<0, 16>) {
+    const [move, value] = await minimax(this, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece);
   }
 
 
@@ -118,47 +119,4 @@ export class GameEngine {
     this.currentState.set(nextState);
   }
 }
-
-export function minimax(game: GameEngine, alpha: number, beta: number, maximizingPlayer: boolean, depth = DEPTH, piece?: IntRange<0, 16>): [Move | undefined, number] {
-  let bestMove: Move | undefined = undefined;
-
-  // if terminal state (game over) or max depth (depth == 0)
-  if (gameWinner(game.board).win || gameDraw(game.board) || depth === 0) {
-    return [bestMove, evaluateBoard(game.board)];
-  }
-
-  let value = maximizingPlayer ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
-
-  const possibleMoves = getPossibleMoves(game.board, piece);
-
-  for (let i = 0; i < possibleMoves.length; i++) {
-    game.move(possibleMoves[i]);
-
-    const [_, childEval] = minimax(game, alpha, beta, !maximizingPlayer, depth - 1);
-
-    if (maximizingPlayer) {
-      if (childEval > value) {
-        value = childEval;
-        bestMove = possibleMoves[i];
-      }
-
-      alpha = Math.max(alpha, childEval);
-    } else {
-      if (childEval < value) {
-        value = childEval;
-        bestMove = possibleMoves[i];
-      }
-
-      beta = Math.min(beta, childEval);
-    }
-    game.undo();
-
-    if (beta <= alpha) {
-      break;
-    }
-  }
-  return [bestMove, value];
-}
-
-
 
