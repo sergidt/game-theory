@@ -1,5 +1,5 @@
 import { computed, Injectable, signal, WritableSignal } from '@angular/core';
-import { Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, IntRange, Move, Position } from './definitions';
+import { Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, IntRange, Move, Piece, Position } from './definitions';
 import { deepClone } from './game.utils';
 import { minimax } from './minimax';
 
@@ -25,7 +25,7 @@ export class GameEngine {
     { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
   ];
 
-  selectedPiece = signal<IntRange<0, 16> | null>(null);
+  selectedPiece = signal<Piece | null>(null);
 
   #moves: WritableSignal<Move[]> = signal<Move[]>([]);
 
@@ -40,8 +40,8 @@ export class GameEngine {
   }
 
 
-  toggleSelection(characteristics: IntRange<0, 16>) {
-    this.selectedPiece.set(this.selectedPiece() === characteristics ? null : characteristics);
+  toggleSelection(piece: Piece) {
+    this.selectedPiece.set(this.selectedPiece()?.characteristics === piece.characteristics ? null : piece);
   }
 
   /**

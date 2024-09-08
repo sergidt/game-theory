@@ -54,7 +54,7 @@ export class GamePieceComponent {
 
   protected highlighted = signal(false);
 
-  protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece());
+  protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece()?.characteristics);
   protected position = computed(() => ({ position: this.piece().position }));
   protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
   protected readonly console = console;
@@ -76,7 +76,7 @@ export class GamePieceComponent {
   clicked(event: NgtThreeEvent<MouseEvent>) {
     if (this.game.currentState() === GameStates.UserSelectingPiece) {
       event.stopPropagation();
-      this.game.toggleSelection(this.piece().characteristics);
+      this.game.toggleSelection(this.piece());
       this.game.nextState(GameActions.PieceSelected);
     }
   }
