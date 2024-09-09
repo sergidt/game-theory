@@ -1,20 +1,21 @@
-import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal } from '@angular/core';
-import { extend, injectLoader, NgtArgs, NgtSelection, NgtVector3 } from 'angular-three';
+import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
+import { extend, injectLoader, NgtArgs, NgtSelection } from 'angular-three';
 import { NgtsCameraControls, NgtsOrbitControls } from 'angular-three-soba/controls';
 import { NgtsEnvironment } from 'angular-three-soba/staging';
-import { AmbientLight, CylinderGeometry, Mesh, MeshStandardMaterial, ShapeGeometry } from 'three';
+import { AmbientLight, CylinderGeometry, Mesh, MeshStandardMaterial } from 'three';
 import { GLTFLoader } from 'three-stdlib';
-import { PIECES } from './definitions';
+import { AvailablePositionComponent } from './available-position.component';
+import { PIECES, Position } from './definitions';
 import { GameEngine } from './game-engine';
 import { GamePieceComponent } from './game-piece.component';
 import { getEmptyPositions } from './game.utils';
 
-extend({ Mesh, ShapeGeometry, MeshStandardMaterial, CylinderGeometry, AmbientLight });
+extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
 
 @Component({
-  selector: 'board',
-  standalone: true,
-  template: `
+    selector: 'board',
+    standalone: true,
+    template: `
       <ngt-ambient-light [intensity]="1"/>
       <ngt-group #group
                  [parameters]="{scale: 0.020, rotation: [1.57, 3.14, 0.93]}">
@@ -27,50 +28,37 @@ extend({ Mesh, ShapeGeometry, MeshStandardMaterial, CylinderGeometry, AmbientLig
           }
         </ngt-group>
 
-        @if (showAvailablePositions()) {
-        <ngt-group>
-          @for (position of torusPositions; track $index; let i = $index) {
-            <ngt-mesh [parameters]="{rotation: [0, 0, 0], position}"
-                      (pointerover)="torusIndexHovered.set(i)"
-                      (pointerout)="torusIndexHovered.set(-1)">
-              <ngt-mesh-standard-material [color]="torusIndexHovered() === i ? 'indianred': 'white'"/>
-              <ngt-cylinder-geometry *args="torusGeometryArgs"/>
-            </ngt-mesh>
-          }
-        </ngt-group>
+        @if (game.showAvailablePositions()) {
+          <ngt-group>
+            @for (position of availablePositions; track $index) {
+              <available-position [position]="position"/>
+            }
+          </ngt-group>
         }
       </ngt-group>
 
       <ngts-orbit-controls/>
       <ngts-environment [options]="{preset: 'city'}"/>
     `,
-  imports: [NgtArgs, NgtsOrbitControls, NgtsEnvironment, NgtSelection, NgtsCameraControls, GamePieceComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [NgtArgs, NgtsOrbitControls, NgtsEnvironment, NgtSelection, NgtsCameraControls, GamePieceComponent, AvailablePositionComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Board {
-  pieces = PIECES;
-  Math = Math;
+    pieces = PIECES;
+    game = inject(GameEngine);
 
-  game = inject(GameEngine);
+    availablePositions: Array<Position> = getEmptyPositions(this.game.board);
 
-  showAvailablePositions = signal(true);
-
-  torusPositions: Array<NgtVector3> = getEmptyPositions(this.game.board).map(p => p.coords);
-
-  torusIndexHovered = signal(-1);
-
-  torusGeometryArgs = [17, 17, 10, 100];
-
-  board = injectLoader(
-    () => GLTFLoader, () => '/assets/board.glb',
-    {
-      //  onLoad: ({ scene }: { scene: NgtGroup }) => {
-      //    if (scene['add'] !== undefined) {
-      //      scene.add(new THREE.AxesHelper(200));
-      //    }
-      //  }
-    }
-  );
+    board = injectLoader(
+        () => GLTFLoader, () => '/assets/board.glb',
+        {
+            //  onLoad: ({ scene }: { scene: NgtGroup }) => {
+            //    if (scene['add'] !== undefined) {
+            //      scene.add(new THREE.AxesHelper(200));
+            //    }
+            //  }
+        }
+    );
 }
 
