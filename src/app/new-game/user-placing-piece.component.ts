@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-    selector: 'user-piece-placing',
+    selector: 'user-placing-piece',
     standalone: true,
     imports: [],
     template: `
@@ -10,6 +10,6 @@ import { Component } from '@angular/core';
     `,
     styles: ``
 })
-export class UserPiecePlacingComponent {
+export class UserPlacingPieceComponent {
 
 }

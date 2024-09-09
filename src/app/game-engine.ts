@@ -32,7 +32,7 @@ export class GameEngine {
 
     #moves: WritableSignal<Move[]> = signal<Move[]>([]);
 
-    showAvailablePositions = signal(true);
+    showAvailablePositions = computed(() => this.currentState() === GameStates.UserPlacingPiece);
 
     get board() {
         return this.#board;

@@ -1,39 +1,39 @@
 import { Component, inject } from '@angular/core';
 import { GameActions } from '../definitions';
 import { GameEngine } from '../game-engine';
-import { CpuPiecePlacingComponent } from './cpu-piece-placing.component';
-import { CpuPieceSelectionComponent } from './cpu-piece-selection.component';
-import { UserPiecePlacingComponent } from './user-piece-placing.component';
-import { UserPieceSelectionComponent } from './user-piece-selection.component';
+import { CpuPlacingPieceComponent } from './cpu-placing-piece.component';
+import { CpuSelectingPieceComponent } from './cpu-selecting-piece.component';
+import { UserPlacingPieceComponent } from './user-placing-piece.component';
+import { UserSelectingPieceComponent } from './user-selecting-piece.component';
 
 @Component({
-  selector: 'game-guide',
-  standalone: true,
-  imports: [
-    UserPieceSelectionComponent,
-    CpuPieceSelectionComponent,
-    UserPiecePlacingComponent,
-    CpuPiecePlacingComponent,
-  ],
-  template: `
+    selector: 'game-guide',
+    standalone: true,
+    imports: [
+        UserSelectingPieceComponent,
+        CpuSelectingPieceComponent,
+        UserPlacingPieceComponent,
+        CpuPlacingPieceComponent,
+    ],
+    template: `
       <h2>Game guide</h2>
-<div>{{game.currentState()}}</div>
+      <div>{{ game.currentState() }}</div>
       @switch (game.currentState()) {
         @case ('NewGame') {
           <div>Are you ready to start a new game?</div>
           <button (click)="game.nextState(GameActions.Ready)">Ready!</button>
         }
         @case ('UserSelectingPiece') {
-          <user-piece-selection/>
+          <user-selecting-piece/>
         }
         @case ('CPUSelectingPiece') {
-          <cpu-piece-selection/>
+          <cpu-selecting-piece/>
         }
         @case ('UserPlacingPiece') {
-          <user-piece-placing/>
+          <user-placing-piece/>
         }
         @case ('CPUPlacingPiece') {
-          <cpu-piece-placing/>
+          <cpu-placing-piece/>
         }
         @case ('UserWon') {
           <div>Congratulations! You win!</div>
@@ -46,7 +46,7 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
         }
       }
     `,
-  styles: `
+    styles: `
       :host {
         display: flex;
         flex-direction: column;
@@ -55,6 +55,6 @@ import { UserPieceSelectionComponent } from './user-piece-selection.component';
     `
 })
 export class GameGuideComponent {
-  protected readonly game = inject(GameEngine);
-  protected readonly GameActions = GameActions;
+    protected readonly game = inject(GameEngine);
+    protected readonly GameActions = GameActions;
 }

@@ -1,15 +1,15 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { GameEngine } from '../game-engine';
+import { Component } from '@angular/core';
 
 @Component({
-    selector: 'cpu-piece-placing',
+    selector: 'cpu-selecting-piece',
     standalone: true,
     imports: [
         NgOptimizedImage
     ],
     template: `
-      <h4>The opponent is thinking about where to place the piece</h4>
+      <p>
+        The opponent selected this piece for you to place</p>
       <img ngSrc="assets/thinking.png"
            width="120"
            height="120"/>
@@ -24,10 +24,6 @@ import { GameEngine } from '../game-engine';
       }
     `
 })
-export class CpuPiecePlacingComponent implements OnInit {
-    #gameEngine = inject(GameEngine);
+export class CpuSelectingPieceComponent {
 
-    ngOnInit() {
-        // console.log(getNextMove(3, this.#gameEngine));
-    }
 }
