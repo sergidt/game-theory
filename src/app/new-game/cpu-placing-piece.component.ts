@@ -1,6 +1,8 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { DEPTH } from '../definitions';
 import { GameEngine } from '../game-engine';
+import { minimaxPromisified } from '../minimax';
 
 @Component({
     selector: 'cpu-placing-piece',
@@ -28,5 +30,7 @@ export class CpuPlacingPieceComponent implements OnInit {
     #game = inject(GameEngine);
 
     ngOnInit() {
+        minimaxPromisified(this.#game, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.#game.selectedPiece()?.characteristics)
+            .then(console.log);
     }
 }

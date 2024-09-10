@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 @Component({
     selector: 'user-selecting-piece',
     standalone: true,
-    imports: [],
     template: `
       <h4>Choosing next opponent's piece</h4><p>
         Select the next piece for the opponent,

@@ -1,4 +1,5 @@
 import { computed, effect, Injectable, signal, WritableSignal } from '@angular/core';
+import { Mesh } from 'three';
 import {
     Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, IntRange, Move, Piece, Position
 } from './definitions';
@@ -26,6 +27,8 @@ export class GameEngine {
         { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
     ];
 
+    #renderedMeshes: Map<IntRange<0, 16>, Mesh> = new Map<IntRange<0, 16>, Mesh>();
+
     selectedPiece = signal<Piece | null>(null);
 
     availablePositionHovered = signal<Position | null>(null);
@@ -43,6 +46,12 @@ export class GameEngine {
     get board() {
         return this.#board;
     }
+
+    registerMesh(piece: IntRange<0, 16>, mesh: Mesh) {
+        this.#renderedMeshes.set(piece, mesh);
+    }
+
+    getCoordinates = (row: number, col: number) => this.#board.find(p => p.row === row && p.col === col)!.coords;
 
     moves = (): Move[] => this.#moves();
 

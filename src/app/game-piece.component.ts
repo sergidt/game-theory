@@ -7,12 +7,12 @@ import { GameEngine } from './game-engine';
 import { getSingleCharacteristic } from './game.utils';
 
 type GLTFResult = GLTF & {
-  nodes: {
-    imagetostl_mesh0: Mesh
-  }
-  materials: {
-    mat0: MeshStandardMaterial
-  }
+    nodes: {
+        imagetostl_mesh0: Mesh
+    }
+    materials: {
+        mat0: MeshStandardMaterial
+    }
 }
 
 const DarkColor = '#2F5CBB';
@@ -22,9 +22,9 @@ const SelectionColor = '#ff9e42';
 extend({ Mesh, MeshPhysicalMaterial });
 
 @Component({
-  selector: 'game-piece',
-  standalone: true,
-  template: `
+    selector: 'game-piece',
+    standalone: true,
+    template: `
       @if (gltf(); as gltf) {
         <ngt-group [dispose]="null">
           <ngt-mesh [parameters]="position()"
@@ -43,48 +43,47 @@ extend({ Mesh, MeshPhysicalMaterial });
         </ngt-group>
       }
     `,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [NgtArgs],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    imports: [NgtArgs],
 })
 export class GamePieceComponent {
-  piece = input.required<Piece>();
+    piece = input.required<Piece>();
 
-  protected game = inject(GameEngine);
+    protected game = inject(GameEngine);
 
-  protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
+    protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path,
+        { onLoad: (result: GLTFResult) => this.game.registerMesh(this.piece().characteristics, result.nodes.imagetostl_mesh0) }) as Signal<GLTFResult>;
 
-  SelectionColor = SelectionColor;
+    SelectionColor = SelectionColor;
 
-  protected highlighted = signal(false);
+    protected highlighted = signal(false);
 
-  protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece()?.characteristics);
-  protected position = computed(() => ({ position: this.piece().position }));
-  protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
-  protected readonly console = console;
+    protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece()?.characteristics);
+    protected position = computed(() => ({ position: this.piece().position }));
+    protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
 
-  pointerOver(event: NgtThreeEvent<PointerEvent>) {
-    if (this.game.currentState() === GameStates.UserSelectingPiece) {
-      event.stopPropagation();
-      this.highlighted.set(true);
+    pointerOver(event: NgtThreeEvent<PointerEvent>) {
+        if (this.game.currentState() === GameStates.UserSelectingPiece) {
+            event.stopPropagation();
+            this.highlighted.set(true);
+        }
     }
-  }
 
-  pointerOut(event: NgtThreeEvent<PointerEvent>) {
-    if (this.game.currentState() === GameStates.UserSelectingPiece) {
-      event.stopPropagation();
-      this.highlighted.set(false);
+    pointerOut(event: NgtThreeEvent<PointerEvent>) {
+        if (this.game.currentState() === GameStates.UserSelectingPiece) {
+            event.stopPropagation();
+            this.highlighted.set(false);
+        }
     }
-  }
 
-  clicked(event: NgtThreeEvent<MouseEvent>) {
-    if (this.game.currentState() === GameStates.UserSelectingPiece) {
-      event.stopPropagation();
-      this.game.toggleSelection(this.piece());
-      this.game.nextState(GameActions.PieceSelected);
+    clicked(event: NgtThreeEvent<MouseEvent>) {
+        if (this.game.currentState() === GameStates.UserSelectingPiece) {
+            event.stopPropagation();
+            this.game.toggleSelection(this.piece());
+            this.game.nextState(GameActions.PieceSelected);
+        }
     }
-  }
 }
-
 
 /*
     anime({
