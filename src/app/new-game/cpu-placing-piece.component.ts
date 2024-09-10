@@ -1,6 +1,6 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { DEPTH } from '../definitions';
+import { DEPTH, Move } from '../definitions';
 import { GameEngine } from '../game-engine';
 import { minimaxPromisified } from '../minimax';
 
@@ -13,8 +13,8 @@ import { minimaxPromisified } from '../minimax';
     template: `
       <h4>The opponent is thinking about where to place the piece</h4>
       <img ngSrc="assets/thinking.png"
-           width="120"
-           height="120"/>
+           width="140"
+           height="140"/>
     `,
     styles: `
       :host {
@@ -31,6 +31,9 @@ export class CpuPlacingPieceComponent implements OnInit {
 
     ngOnInit() {
         minimaxPromisified(this.#game, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.#game.selectedPiece()?.characteristics)
-            .then(console.log);
+            .then(([move, value]: [Move | undefined, number]) => {
+                if (move)
+                    this.#game.move(move);
+            });
     }
 }

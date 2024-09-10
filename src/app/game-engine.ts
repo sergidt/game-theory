@@ -73,8 +73,31 @@ export class GameEngine {
      * @param move
      */
     move(move: Move) {
+        debugger;
+        const mesh = this.#renderedMeshes.get(move.piece as IntRange<0, 16>);
+        const newCoords = this.getCoordinates(move.row, move.col);
+        console.log('Moving piece: ', mesh, newCoords);
+        /*
+                anime({
+                    targets: [mesh!.position],
+                    z: 57,
+                    y: 0,
+                    easing: 'easeInQuad',
+                    duration: 1000,
+                    direction: 'normal',
+                });
+                this.#setPieceOnBoard(move);
+                this.#registerMove(move);
+
+         */
+    }
+
+    #setPieceOnBoard(move: Move) {
         this.#board = deepClone<Board>(this.#board);
         this.#board.find((p: Position) => p.row === move.row && p.col === move.col)!.piece = move.piece;
+    };
+
+    #registerMove(move: Move) {
         this.#moves.set([...this.#moves(), move]);
     }
 
@@ -143,3 +166,13 @@ export class GameEngine {
     }
 }
 
+/*
+    anime({
+        targets: [event.object.position],
+        z: 57,
+        y: 0,
+        easing: "easeInQuad",
+        duration: 1000,
+        direction: "normal",
+      });
+*/
