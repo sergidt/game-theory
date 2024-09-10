@@ -1,24 +1,24 @@
 import { DEPTH, IntRange, Move } from './definitions';
-import { GameEngine } from './game-engine';
+import { BoardController } from './game-engine';
 import { evaluateBoard, gameDraw, gameWinner, getPossibleMoves } from './game.utils';
 
-export function minimax(game: GameEngine, alpha: number, beta: number, maximizingPlayer: boolean, depth = DEPTH,
+export function minimax(boardController: BoardController, alpha: number, beta: number, maximizingPlayer: boolean, depth = DEPTH,
     piece?: IntRange<0, 16>): [Move | undefined, number] {
     let bestMove: Move | undefined = undefined;
 
     // if terminal state (winner or draw) or max depth reached
-    if (gameWinner(game.board).win || gameDraw(game.board) || depth === 0) {
-        return [bestMove, evaluateBoard(game.board)];
+    if (gameWinner(boardController.board).win || gameDraw(boardController.board) || depth === 0) {
+        return [bestMove, evaluateBoard(boardController.board)];
     }
 
     let value = maximizingPlayer ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
 
-    const possibleMoves = getPossibleMoves(game.board, piece);
+    const possibleMoves = getPossibleMoves(boardController.board, piece);
 
     for (let i = 0; i < possibleMoves.length; i++) {
-        game.move(possibleMoves[i]);
+        boardController.move(possibleMoves[i]);
 
-        const [_, childEval] = minimax(game, alpha, beta, !maximizingPlayer, depth - 1);
+        const [_, childEval] = minimax(boardController, alpha, beta, !maximizingPlayer, depth - 1);
 
         if (maximizingPlayer) {
             if (childEval > value) {
@@ -35,7 +35,7 @@ export function minimax(game: GameEngine, alpha: number, beta: number, maximizin
 
             beta = Math.min(beta, childEval);
         }
-        game.undo();
+        boardController.undo();
 
         if (beta <= alpha) {
             break;

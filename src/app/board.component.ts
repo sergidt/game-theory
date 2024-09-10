@@ -48,7 +48,7 @@ export class Board {
     pieces = PIECES;
     game = inject(GameEngine);
 
-    availablePositions: Array<Position> = getEmptyPositions(this.game.board);
+    availablePositions: Array<Position> = getEmptyPositions(this.game.boardController.board);
 
     board = injectLoader(
         () => GLTFLoader, () => '/assets/board.glb',
