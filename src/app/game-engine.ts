@@ -1,8 +1,8 @@
-import { computed, Injectable, signal, WritableSignal } from '@angular/core';
+import { computed, effect, Injectable, signal, WritableSignal } from '@angular/core';
 import {
-  Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, IntRange, Move, Piece, Position
+    Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, IntRange, Move, Piece, Position
 } from './definitions';
-import { deepClone } from './game.utils';
+import { deepClone, describePiece } from './game.utils';
 import { minimaxPromisified } from './minimax';
 
 @Injectable({ providedIn: 'root' })
@@ -33,6 +33,12 @@ export class GameEngine {
     #moves: WritableSignal<Move[]> = signal<Move[]>([]);
 
     showAvailablePositions = computed(() => this.currentState() === GameStates.UserPlacingPiece);
+
+    constructor() {
+        effect(() => {
+            console.log('[Game Engine] -> selected piece: ', this.selectedPiece() ? describePiece(this.selectedPiece()!) : 'None');
+        });
+    }
 
     get board() {
         return this.#board;

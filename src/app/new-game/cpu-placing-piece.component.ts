@@ -25,9 +25,8 @@ import { GameEngine } from '../game-engine';
     `
 })
 export class CpuPlacingPieceComponent implements OnInit {
-    #gameEngine = inject(GameEngine);
+    #game = inject(GameEngine);
 
     ngOnInit() {
-        // console.log(getNextMove(3, this.#gameEngine));
     }
 }
