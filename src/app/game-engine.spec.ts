@@ -1,40 +1,40 @@
 import { Board, EMPTY, Move } from './definitions';
-import { GameEngine } from './game-engine';
+import { BoardController } from './game-engine';
 import { deepClone, getAvailablePieces, getEmptyPositions, getPossibleMoves } from './game.utils';
 
-describe('Game Engine', () => {
-  let engine: GameEngine;
+describe('Border Controller', () => {
+  let boardController: BoardController;
 
   beforeEach(() => {
-    engine = new GameEngine();
+    boardController = new BoardController();
   });
 
   describe('move', () => {
     it('places a piece on an empty position', () => {
       const move: Move = { row: 0, col: 0, piece: 1 };
-      engine.move(move);
-      expect(engine.board.find(p => p.row === move.row && p.col === move.col)!.piece).toBe(move.piece);
+      boardController.move(move);
+      expect(boardController.board.find(p => p.row === move.row && p.col === move.col)!.piece).toBe(move.piece);
     });
 
     it('overwrites a piece on a non-empty position', () => {
       const initialMove: Move = { row: 0, col: 0, piece: 1 };
       const newMove: Move = { row: 0, col: 0, piece: 2 };
-      engine.move(initialMove);
-      engine.move(newMove);
-      expect(engine.board.find(p => p.row === newMove.row && p.col === newMove.col)!.piece).toBe(newMove.piece);
+      boardController.move(initialMove);
+      boardController.move(newMove);
+      expect(boardController.board.find(p => p.row === newMove.row && p.col === newMove.col)!.piece).toBe(newMove.piece);
     });
 
     it('adds the move to the moves list', () => {
       const move: Move = { row: 0, col: 0, piece: 1 };
-      engine.move(move);
-      expect(engine.moves()).toContain(move);
+      boardController.move(move);
+      expect(boardController.moves).toContain(move);
     });
 
     it('does not modify the original board array', () => {
-      const originalBoard = deepClone(engine.board);
+      const originalBoard = deepClone(boardController.board);
       const move: Move = { row: 0, col: 0, piece: 1 };
-      engine.move(move);
-      expect(engine.board).not.toBe(originalBoard);
+      boardController.move(move);
+      expect(boardController.board).not.toBe(originalBoard);
     });
   });
 
@@ -42,25 +42,25 @@ describe('Game Engine', () => {
     it('removes the last move from the moves list', () => {
       const move1: Move = { row: 0, col: 0, piece: 1 };
       const move2: Move = { row: 1, col: 1, piece: 2 };
-      engine.move(move1);
-      engine.move(move2);
-      engine.undo();
-      expect(engine.moves()).not.toContain(move2);
-      expect(engine.moves()).toContain(move1);
+      boardController.move(move1);
+      boardController.move(move2);
+      boardController.undo();
+      expect(boardController.moves).not.toContain(move2);
+      expect(boardController.moves).toContain(move1);
     });
 
     it('restores the last position to empty', () => {
       const move: Move = { row: 0, col: 0, piece: 1 };
-      engine.move(move);
-      engine.undo();
-      expect(engine.board.find(p => p.row === move.row && p.col === move.col)!.piece).toBe(EMPTY);
+      boardController.move(move);
+      boardController.undo();
+      expect(boardController.board.find(p => p.row === move.row && p.col === move.col)!.piece).toBe(EMPTY);
     });
 
     it('does nothing if there are no moves to undo', () => {
-      const originalBoard = deepClone(engine.board);
-      engine.undo();
-      expect(engine.board).toEqual(originalBoard);
-      expect(engine.moves().length).toBe(0);
+      const originalBoard = deepClone(boardController.board);
+      boardController.undo();
+      expect(boardController.board).toEqual(originalBoard);
+      expect(boardController.moves.length).toBe(0);
     });
   });
 
@@ -140,5 +140,4 @@ describe('Game Engine', () => {
       expect(moves.length).toBe(emptyPositions.length * availablePieces.length);
     });
   });
-
 });
