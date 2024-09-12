@@ -30,10 +30,11 @@ export class CpuPlacingPieceComponent implements OnInit {
     #game = inject(GameEngine);
 
     ngOnInit() {
-        minimaxPromisified(this.#game, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.#game.selectedPiece()?.characteristics)
+        minimaxPromisified(this.#game.boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.#game.selectedPiece()?.characteristics)
             .then(([move, value]: [Move | undefined, number]) => {
-                if (move)
-                    this.#game.move(move);
+                console.log(move);
+                //         if (move)
+                //             this.#game.move(move);
             });
     }
 }

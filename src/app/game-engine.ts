@@ -1,13 +1,10 @@
-import { computed, effect, Injectable, signal, WritableSignal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { Mesh } from 'three';
-import {
-    Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, IntRange, Move, Piece, Position
-} from './definitions';
+import { Board, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, IntRange, Move, Piece, Position } from './definitions';
 import { deepClone, describePiece } from './game.utils';
-import { minimaxPromisified } from './minimax';
 
 @Injectable({ providedIn: 'root' })
-export class GameEngine {
+export class BoardController {
     #board: Board = [
         { row: 0, col: 0, coords: [57, 0, -57], piece: EMPTY },
         { row: 0, col: 1, coords: [57, 0, -19], piece: EMPTY },
@@ -27,37 +24,68 @@ export class GameEngine {
         { row: 3, col: 3, coords: [-57, 0, 57], piece: EMPTY },
     ];
 
+    #moveHistory: WritableSignal<Move[]> = signal<Move[]>([]);
+
+    get board() {
+        return this.#board;
+    }
+
+    getCoordinates = (row: number, col: number) => this.#board.find(p => p.row === row && p.col === col)!.coords;
+
+    moves = (): Move[] => this.#moveHistory();
+
+    move(move: Move) {
+        this.#setPieceOnBoard(move);
+        this.#registerMove(move);
+    }
+
+    #setPieceOnBoard(move: Move) {
+        this.#board = deepClone<Board>(this.#board);
+        this.#board.find((p: Position) => p.row === move.row && p.col === move.col)!.piece = move.piece;
+    };
+
+    #registerMove(move: Move) {
+        this.#moveHistory.set([...this.#moveHistory(), move]);
+    }
+
+    undo() {
+        const moves = this.#moveHistory();
+        const lastMove = moves.pop();
+
+        if (lastMove) {
+            // Remove the last piece placed on the board
+            this.move({ row: lastMove.row, col: lastMove.col, piece: EMPTY });
+            this.#moveHistory.set(moves);
+        }
+    }
+}
+
+@Injectable({ providedIn: 'root' })
+export class GameEngine {
+    boardController = inject(BoardController);
+
     #renderedMeshes: Map<IntRange<0, 16>, Mesh> = new Map<IntRange<0, 16>, Mesh>();
 
     selectedPiece = signal<Piece | null>(null);
 
     availablePositionHovered = signal<Position | null>(null);
 
-    #moves: WritableSignal<Move[]> = signal<Move[]>([]);
-
     showAvailablePositions = computed(() => this.currentState() === GameStates.UserPlacingPiece);
 
     constructor() {
         effect(() => {
-            console.log('[Game Engine] -> selected piece: ', this.selectedPiece() ? describePiece(this.selectedPiece()!) : 'None');
+            console.log(`[Game Engine] -> selected piece: ${ this.selectedPiece()?.characteristics || '' }`, this.selectedPiece() ?
+                describePiece(this.selectedPiece()!) : 'None');
         });
-    }
-
-    get board() {
-        return this.#board;
     }
 
     registerMesh(piece: IntRange<0, 16>, mesh: Mesh) {
         this.#renderedMeshes.set(piece, mesh);
     }
 
-    getCoordinates = (row: number, col: number) => this.#board.find(p => p.row === row && p.col === col)!.coords;
-
-    moves = (): Move[] => this.#moves();
-
-    async cpuPlacePiece(piece: IntRange<0, 16>) {
-        const [move, value] = await minimaxPromisified(this, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece);
-    }
+    //async cpuPlacePiece(piece: IntRange<0, 16>) {
+    //    const [move, value] = await minimaxPromisified(this, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece);
+    //}
 
     toggleSelection(piece: Piece) {
         this.selectedPiece.set(this.selectedPiece()?.characteristics === piece.characteristics ? null : piece);
@@ -72,47 +100,9 @@ export class GameEngine {
      * The piece is provided in the position object.
      * @param move
      */
-    move(move: Move) {
-        debugger;
-        const mesh = this.#renderedMeshes.get(move.piece as IntRange<0, 16>);
-        const newCoords = this.getCoordinates(move.row, move.col);
-        console.log('Moving piece: ', mesh, newCoords);
-        /*
-                anime({
-                    targets: [mesh!.position],
-                    z: 57,
-                    y: 0,
-                    easing: 'easeInQuad',
-                    duration: 1000,
-                    direction: 'normal',
-                });
-                this.#setPieceOnBoard(move);
-                this.#registerMove(move);
 
-         */
-    }
 
-    #setPieceOnBoard(move: Move) {
-        this.#board = deepClone<Board>(this.#board);
-        this.#board.find((p: Position) => p.row === move.row && p.col === move.col)!.piece = move.piece;
-    };
-
-    #registerMove(move: Move) {
-        this.#moves.set([...this.#moves(), move]);
-    }
-
-    undo() {
-        const moves = this.#moves();
-        const lastMove = moves.pop();
-
-        if (lastMove) {
-            // Remove the last piece placed on the board
-            this.move({ row: lastMove.row, col: lastMove.col, piece: EMPTY });
-            this.#moves.set(moves);
-        }
-    }
-
-    // GAME STATE MACHINE
+        // GAME STATE MACHINE
 
     currentState = signal<GameState>(GameStates.NewGame);
 
