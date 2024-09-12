@@ -1,5 +1,9 @@
 import { NgtVector3 } from 'angular-three';
 
+export const DarkColor = '#2F5CBB';
+export const LightColor = '#ffe7e2';
+export const SelectionColor = '#ff9e42';
+
 /*
     Each property describes these characteristics with bits (0, 1):
     Size: Big -> 1, Small -> 0
