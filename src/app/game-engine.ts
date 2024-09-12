@@ -1,4 +1,7 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toObservableSignal } from 'ngxtension/to-observable-signal';
+import { tap } from 'rxjs';
 import { Mesh } from 'three';
 import { Board, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, Move, Piece, PieceCharacteristics, Position } from './definitions';
 import { deepClone, describePiece } from './game.utils';
@@ -67,16 +70,14 @@ export class GameEngine {
   boardController = inject(BoardController);
 
   #renderedMeshes: Map<PieceCharacteristics, Mesh> = new Map<PieceCharacteristics, Mesh>();
-
+  #destroyRef = inject(DestroyRef);
   pointedPiece = signal<PieceCharacteristics | null>(null);
-
   selectedPiece = signal<Piece | null>(null);
-
   availablePositionHovered = signal<Position | null>(null);
-
   showAvailablePositions = computed(() => this.currentState() === GameStates.UserPlacingPiece);
 
   constructor() {
+    this.#cpuStatesManagement();
     effect(() => {
       console.log(`[Game Engine] -> selected piece: ${this.selectedPiece()?.characteristics || ''}`, this.selectedPiece() ?
         describePiece(this.selectedPiece()!) : 'None');
@@ -92,6 +93,13 @@ export class GameEngine {
   piecePointedOut() {
     if (this.currentState() === GameStates.UserSelectingPiece) {
       this.pointedPiece.set(null);
+    }
+  }
+
+  pieceSelectedByUser(piece: Piece) {
+    if (this.currentState() === GameStates.UserSelectingPiece) {
+      this.toggleSelection(piece);
+      this.nextState(GameActions.PieceSelected);
     }
   }
 
@@ -154,6 +162,25 @@ export class GameEngine {
       [GameActions.PlayAgain]: GameStates.NewGame
     }
   };
+
+  #cpuStatesManagement() {
+    toObservableSignal(this.currentState)
+      .pipe(
+        tap(this.#manageCPUStates),
+        takeUntilDestroyed(this.#destroyRef)
+      )
+      .subscribe();
+  }
+
+  #manageCPUStates(state: GameState) {
+    switch (state) {
+      case GameStates.CPUPlacingPiece:
+        break;
+
+      case GameStates.CPUSelectingPiece:
+        break;
+    }
+  }
 
   getCurrentStateAvailableActions = () => this.#allowedTransitions[this.currentState()];
 

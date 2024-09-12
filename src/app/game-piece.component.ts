@@ -2,7 +2,7 @@ import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject, input, Signal } fr
 import { extend, injectLoader, NgtArgs, NgtThreeEvent } from 'angular-three';
 import { Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
-import { DarkColor, GameActions, GameStates, LightColor, Piece, SelectionColor, } from './definitions';
+import { DarkColor, LightColor, Piece, SelectionColor } from './definitions';
 import { GameEngine } from './game-engine';
 import { getSingleCharacteristic } from './game.utils';
 
@@ -57,7 +57,6 @@ export class GamePieceComponent {
   SelectionColor = SelectionColor;
 
   protected piecePointed = computed(() => this.game.pointedPiece() === this.piece().characteristics);
-
   protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece()?.characteristics);
   protected position = computed(() => ({ position: this.piece().position }));
   protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
@@ -73,14 +72,7 @@ export class GamePieceComponent {
   }
 
   clicked(event: NgtThreeEvent<MouseEvent>) {
-    if (this.game.currentState() === GameStates.UserSelectingPiece) {
-      event.stopPropagation();
-      this.game.toggleSelection(this.piece());
-      this.game.nextState(GameActions.PieceSelected);
-    }
+    event.stopPropagation();
+    this.game.pieceSelectedByUser(this.piece());
   }
 }
-
-
-
-
