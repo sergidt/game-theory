@@ -1,6 +1,6 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { Mesh } from 'three';
-import { Board, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, IntRange, Move, Piece, Position } from './definitions';
+import { Board, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, Move, Piece, PieceCharacteristics, Position } from './definitions';
 import { deepClone, describePiece } from './game.utils';
 
 @Injectable({ providedIn: 'root' })
@@ -66,7 +66,9 @@ export class BoardController {
 export class GameEngine {
   boardController = inject(BoardController);
 
-  #renderedMeshes: Map<IntRange<0, 16>, Mesh> = new Map<IntRange<0, 16>, Mesh>();
+  #renderedMeshes: Map<PieceCharacteristics, Mesh> = new Map<PieceCharacteristics, Mesh>();
+
+  //pointedPiece = signal<
 
   selectedPiece = signal<Piece | null>(null);
 
@@ -81,11 +83,11 @@ export class GameEngine {
     });
   }
 
-  registerMesh(piece: IntRange<0, 16>, mesh: Mesh) {
+  registerMesh(piece: PieceCharacteristics, mesh: Mesh) {
     this.#renderedMeshes.set(piece, mesh);
   }
 
-  //async cpuPlacePiece(piece: IntRange<0, 16>) {
+  //async cpuPlacePiece(piece: PieceCharacteristics) {
   //    const [move, value] = await minimaxPromisified(this, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece);
   //}
 
