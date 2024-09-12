@@ -1,4 +1,4 @@
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject, input, signal, Signal } from '@angular/core';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject, input, Signal } from '@angular/core';
 import { extend, injectLoader, NgtArgs, NgtThreeEvent } from 'angular-three';
 import { Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
@@ -30,7 +30,7 @@ extend({ Mesh, MeshPhysicalMaterial });
                     (click)="clicked($event)"
                     (pointerover)="pointerOver($event)"
                     (pointerout)="pointerOut($event)">
-            <ngt-mesh-physical-material [color]="selected() ? 'red' : highlighted() ? SelectionColor : color()"
+            <ngt-mesh-physical-material [color]="selected() ? 'red' : piecePointed() ? SelectionColor : color()"
                                         [metalness]="0.8"
                                         [roughness]="0.8"
                                         [clearcoat]="0.67"
@@ -47,29 +47,29 @@ export class GamePieceComponent {
 
   protected game = inject(GameEngine);
 
-  protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path,
-    { onLoad: (result: GLTFResult) => this.game.registerMesh(this.piece().characteristics, result.nodes.imagetostl_mesh0) }) as Signal<GLTFResult>;
+  protected gltf = injectLoader(
+    () => GLTFLoader, () => this.piece().path,
+    {
+      onLoad: (result: GLTFResult) => this.game.registerMesh(this.piece().characteristics, result.nodes.imagetostl_mesh0)
+    }
+  ) as Signal<GLTFResult>;
 
   SelectionColor = SelectionColor;
 
-  protected highlighted = signal(false);
+  protected piecePointed = computed(() => this.game.pointedPiece() === this.piece().characteristics);
 
   protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece()?.characteristics);
   protected position = computed(() => ({ position: this.piece().position }));
   protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
 
   pointerOver(event: NgtThreeEvent<PointerEvent>) {
-    if (this.game.currentState() === GameStates.UserSelectingPiece) {
-      event.stopPropagation();
-      this.highlighted.set(true);
-    }
+    event.stopPropagation();
+    this.game.userPointingPiece(this.piece().characteristics);
   }
 
   pointerOut(event: NgtThreeEvent<PointerEvent>) {
-    if (this.game.currentState() === GameStates.UserSelectingPiece) {
-      event.stopPropagation();
-      this.highlighted.set(false);
-    }
+    event.stopPropagation();
+    this.game.piecePointedOut();
   }
 
   clicked(event: NgtThreeEvent<MouseEvent>) {

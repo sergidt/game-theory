@@ -68,7 +68,7 @@ export class GameEngine {
 
   #renderedMeshes: Map<PieceCharacteristics, Mesh> = new Map<PieceCharacteristics, Mesh>();
 
-  //pointedPiece = signal<
+  pointedPiece = signal<PieceCharacteristics | null>(null);
 
   selectedPiece = signal<Piece | null>(null);
 
@@ -81,6 +81,18 @@ export class GameEngine {
       console.log(`[Game Engine] -> selected piece: ${this.selectedPiece()?.characteristics || ''}`, this.selectedPiece() ?
         describePiece(this.selectedPiece()!) : 'None');
     });
+  }
+
+  userPointingPiece(characteristics: PieceCharacteristics) {
+    if (this.currentState() === GameStates.UserSelectingPiece) {
+      this.pointedPiece.set(characteristics);
+    }
+  }
+
+  piecePointedOut() {
+    if (this.currentState() === GameStates.UserSelectingPiece) {
+      this.pointedPiece.set(null);
+    }
   }
 
   registerMesh(piece: PieceCharacteristics, mesh: Mesh) {
