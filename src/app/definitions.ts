@@ -5,7 +5,7 @@ export const LightColor = '#ffe7e2';
 export const SelectionColor = '#ff9e42';
 
 // the minimax algorithm takes only few ms to return any result. We want to simulate a normal behavior applying this delay
-export const CPU_THINKING_DELAY = 2000;
+export const CPU_THINKING_DELAY = 1000;
 
 /*
     Each property describes these characteristics with bits (0, 1):

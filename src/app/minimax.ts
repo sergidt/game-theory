@@ -44,6 +44,7 @@ export function minimax(boardController: BoardController, alpha: number, beta: n
   return [bestMove, value];
 }
 
+
 // minimax as Promise
 export async function minimaxPromisified(...params: Parameters<typeof minimax>): Promise<[Move | undefined, number]> {
   return new Promise(resolve => setTimeout(() => resolve(minimax(...params)), CPU_THINKING_DELAY));

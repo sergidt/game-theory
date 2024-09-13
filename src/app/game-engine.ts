@@ -5,7 +5,7 @@ import { toObservableSignal } from 'ngxtension/to-observable-signal';
 import { tap } from 'rxjs';
 import { Mesh } from 'three';
 import { Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, Move, Piece, PieceCharacteristics, Position } from './definitions';
-import { deepClone, describePiece } from './game.utils';
+import { deepClone, describePiece, evaluateBoard, gameWinner, getAvailablePieces, getPossibleMoves, shuffleArray } from './game.utils';
 import { minimaxPromisified } from './minimax';
 
 @Injectable({ providedIn: 'root' })
@@ -41,9 +41,18 @@ export class BoardController {
     return this.#moveHistory;
   }
 
-  move(move: Move) {
+  getAvailablePieces(): Array<PieceCharacteristics> {
+    return getAvailablePieces(this.#board);
+  }
+
+  getPossibleMoves(withPiece?: PieceCharacteristics): Array<Move> {
+    return getPossibleMoves(this.#board, withPiece);
+  }
+
+  move(move: Move): Board {
     this.#setPieceOnBoard(move);
     this.#registerMove(move);
+    return this.#board;
   }
 
   #setPieceOnBoard(move: Move) {
@@ -55,7 +64,7 @@ export class BoardController {
     this.#moveHistory = [...this.moves, move];
   }
 
-  undo() {
+  undo(): Board {
     const moves = this.moves.slice();
     const lastMove = moves.pop();
 
@@ -64,6 +73,7 @@ export class BoardController {
       this.move({ row: lastMove.row, col: lastMove.col, piece: EMPTY });
       this.#moveHistory = moves;
     }
+    return this.#board;
   }
 }
 
@@ -80,6 +90,7 @@ export class GameEngine {
 
   constructor() {
     this.#cpuStatesManagement();
+
     effect(() => {
       console.log(`[Game Engine] -> selected piece: ${this.selectedPiece()?.characteristics || ''}`, this.selectedPiece() ?
         describePiece(this.selectedPiece()!) : 'None');
@@ -182,6 +193,36 @@ export class GameEngine {
     }
   };
 
+  /*
+  It is not a perfomant algorithm
+  */
+  #cpuSelectingNextUserPiece(): Promise<PieceCharacteristics> {
+    return new Promise(resolve => {
+      const availablePieces = this.boardController.getAvailablePieces();
+
+      if (availablePieces.length > 13) // less than 3 pieces are placed, impossible to win, yet
+        resolve(shuffleArray(availablePieces)[0]);
+      else {
+        const possibleMoves: Array<Move & { win: boolean; value: number; }> = this.boardController.getPossibleMoves()
+          .map(_ => ({ ..._, value: -1, win: false }));
+
+        possibleMoves.forEach(move => {
+          const board = this.boardController.move(move);
+          move.value = evaluateBoard(board);
+          move.win = gameWinner(board).win;
+          this.boardController.undo();
+        });
+
+        // console.log('>>>>>>>>>>>>>>>>>>');
+        // console.log(possibleMoves.sort((a, b) => a.value - b.value));
+        // console.log(this.boardController.board);
+
+        resolve(possibleMoves.sort((a, b) => a.value - b.value).find(_ => _.win)!.piece as PieceCharacteristics);
+
+      }
+    });
+  }
+
   #cpuStatesManagement() {
     toObservableSignal(this.currentState)
       .pipe(
@@ -207,6 +248,8 @@ export class GameEngine {
         break;
 
       case GameStates.CPUSelectingPiece:
+        this.#cpuSelectingNextUserPiece()
+          .then(console.log);
         break;
     }
   }
@@ -227,14 +270,3 @@ export class GameEngine {
     this.currentState.set(nextState);
   }
 }
-
-/*
-    anime({
-        targets: [event.object.position],
-        z: 57,
-        y: 0,
-        easing: "easeInQuad",
-        duration: 1000,
-        direction: "normal",
-      });
-*/

@@ -13,9 +13,7 @@ export const getEmptyPositions = (board: Board) => board.filter(p => p.piece ===
 
 export const getFilledPositions = (positions: Position[]) => positions.filter(p => p.piece !== EMPTY);
 
-export function number2binary(number: number): string {
-  return (number >>> 0).toString(2).padStart(4, '0');
-}
+export const number2binary = (number: number) => (number >>> 0).toString(2).padStart(4, '0');
 
 export function getSingleCharacteristic(piece: Piece, characteristic: 'Size' | 'Colour' | 'Shape' | 'Hole'): 0 | 1 {
   const characteristicValue = Number(number2binary(piece.characteristics).at(CharacteristicIndices[characteristic])!);
@@ -69,7 +67,6 @@ export function featuresByPosition(positions: Position[]) {
   }
   return featuresByPosition;
 }
-
 export function getAvailablePieces(board: Board): Array<PieceCharacteristics> {
   const pieces = new Set<PieceCharacteristics>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
   const placedPieces = board.filter(p => p.piece !== EMPTY).map(p => p.piece);
@@ -126,3 +123,10 @@ export const shuffleArray = <T>(array: T[]) => {
     .sort((a, b) => a.sort - b.sort)
     .map((a) => a.value);
 };
+
+export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
+  return array.reduce((result, currentValue) => {
+    const groupKey = currentValue[key] as unknown as string;
+    return { ...result, [groupKey]: [...(result[groupKey] || []), currentValue] };
+  }, {} as Record<string, T[]>);
+}
