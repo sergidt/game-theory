@@ -116,6 +116,13 @@ export class GameEngine {
     }
   }
 
+  #pieceSelectedByCPU(piece: Piece) {
+    if (this.currentState() === GameStates.CPUSelectingPiece) {
+      this.toggleSelection(piece);
+      this.nextState(GameActions.PieceSelected);
+    }
+  }
+
   registerMesh(piece: PieceCharacteristics, mesh: Mesh) {
     this.#renderedMeshes.set(piece, mesh);
   }
@@ -249,7 +256,7 @@ export class GameEngine {
 
       case GameStates.CPUSelectingPiece:
         this.#cpuSelectingNextUserPiece()
-          .then(console.log);
+          .then(piece => this.#pieceSelectedByCPU());
         break;
     }
   }

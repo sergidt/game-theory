@@ -9,17 +9,17 @@ import { GameEngine } from './game-engine';
 import { GameGuideComponent } from './new-game/game-guide.component';
 
 @Component({
-    selector: 'app-root',
-    standalone: true,
-    imports: [
-        NgtCanvas,
-        GameDialogComponent,
-        GameDescriptionComponent,
-        RouterOutlet,
-        GameGuideComponent,
-        AboutComponent
-    ],
-    template: `
+  selector: 'app-root',
+  standalone: true,
+  imports: [
+    NgtCanvas,
+    GameDialogComponent,
+    GameDescriptionComponent,
+    RouterOutlet,
+    GameGuideComponent,
+    AboutComponent
+  ],
+  template: `
       @let show = showDialog();
 
       @if (show !== 'None') {
@@ -45,36 +45,36 @@ import { GameGuideComponent } from './new-game/game-guide.component';
       <div class="main-content">
         <ngt-canvas #canvas
                     [sceneGraph]="sceneGraph"
-                    [camera]="{position: [8,-6,6], fov: 90}"/>
+                    [camera]="{position: [8,-6,6], fov: 60}"/>
 
         <div class="guide-panel">
           <game-guide/>
         </div>
       </div>
     `,
-    styles: [`
+  styles: [`
                :host {
                  display: block;
                  width: 100%;
                  height: 100%;
                }
              `],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AppComponent {
-    protected sceneGraph = Board;
-    protected showDialog: WritableSignal<'None' | 'Instructions' | 'About'> = signal('None');
+  protected sceneGraph = Board;
+  protected showDialog: WritableSignal<'None' | 'Instructions' | 'About'> = signal('None');
 
-    #game = inject(GameEngine);
+  #game = inject(GameEngine);
 
-    constructor() {
-        this.init();
-    }
+  constructor() {
+    this.init();
+  }
 
-    async init() {
-        // console.time('minimax');
-        // const value = await minimaxPromisified(this.#game, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, 8);
-        //  console.timeEnd('minimax');
-        // console.log('Minimax', value);
-    }
+  async init() {
+    // console.time('minimax');
+    // const value = await minimaxPromisified(this.#game, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, 8);
+    //  console.timeEnd('minimax');
+    // console.log('Minimax', value);
+  }
 }
