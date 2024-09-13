@@ -1,10 +1,12 @@
 import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import anime from 'animejs';
 import { toObservableSignal } from 'ngxtension/to-observable-signal';
 import { tap } from 'rxjs';
 import { Mesh } from 'three';
-import { Board, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, Move, Piece, PieceCharacteristics, Position } from './definitions';
+import { Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, Move, Piece, PieceCharacteristics, Position } from './definitions';
 import { deepClone, describePiece } from './game.utils';
+import { minimaxPromisified } from './minimax';
 
 @Injectable({ providedIn: 'root' })
 export class BoardController {
@@ -107,16 +109,33 @@ export class GameEngine {
     this.#renderedMeshes.set(piece, mesh);
   }
 
-  //async cpuPlacePiece(piece: PieceCharacteristics) {
-  //    const [move, value] = await minimaxPromisified(this, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, piece);
-  //}
-
   toggleSelection(piece: Piece) {
     this.selectedPiece.set(this.selectedPiece()?.characteristics === piece.characteristics ? null : piece);
   }
 
   hoverAvailablePosition(position: Position | null) {
     this.availablePositionHovered.set(position);
+  }
+
+  deselectedAnyPiece() {
+    this.selectedPiece.set(null);
+    this.pointedPiece.set(null);
+  }
+
+  move(move: Move): Promise<void> {
+    this.boardController.move(move);
+    const position: [number, number, number] = this.boardController.getCoordinates(move.row, move.col) as [number, number, number];
+
+    return anime({
+      targets: [this.#renderedMeshes.get(move.piece as PieceCharacteristics)!.position],
+      x: position[0],
+      y: position[1],
+      z: position[2],
+      easing: "easeInQuad",
+      duration: 1000,
+      direction: "normal",
+    })
+      .finished;
   }
 
   /**
@@ -166,7 +185,7 @@ export class GameEngine {
   #cpuStatesManagement() {
     toObservableSignal(this.currentState)
       .pipe(
-        tap(this.#manageCPUStates),
+        tap(this.#manageCPUStates.bind(this)),
         takeUntilDestroyed(this.#destroyRef)
       )
       .subscribe();
@@ -175,6 +194,16 @@ export class GameEngine {
   #manageCPUStates(state: GameState) {
     switch (state) {
       case GameStates.CPUPlacingPiece:
+        minimaxPromisified(this.boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.selectedPiece()?.characteristics)
+          .then(([move, value]: [Move | undefined, number]) => {
+            if (move) {
+              this.move(move)
+                .then(() => {
+                  this.deselectedAnyPiece();
+                  this.nextState(GameActions.PiecePlaced);
+                })
+            }
+          });
         break;
 
       case GameStates.CPUSelectingPiece:

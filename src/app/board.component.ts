@@ -13,9 +13,9 @@ import { getEmptyPositions } from './game.utils';
 extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
 
 @Component({
-    selector: 'board',
-    standalone: true,
-    template: `
+  selector: 'board',
+  standalone: true,
+  template: `
       <ngt-ambient-light [intensity]="1"/>
       <ngt-group #group
                  [parameters]="{scale: 0.020, rotation: [1.57, 3.14, 0.93]}">
@@ -40,25 +40,25 @@ extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
       <ngts-orbit-controls/>
       <ngts-environment [options]="{preset: 'city'}"/>
     `,
-    imports: [NgtArgs, NgtsOrbitControls, NgtsEnvironment, NgtSelection, NgtsCameraControls, GamePieceComponent, AvailablePositionComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgtArgs, NgtsOrbitControls, NgtsEnvironment, NgtSelection, NgtsCameraControls, GamePieceComponent, AvailablePositionComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Board {
-    pieces = PIECES;
-    game = inject(GameEngine);
+  pieces = PIECES;
+  game = inject(GameEngine);
 
-    availablePositions: Array<Position> = getEmptyPositions(this.game.boardController.board);
+  availablePositions: Array<Position> = getEmptyPositions(this.game.boardController.board);
 
-    board = injectLoader(
-        () => GLTFLoader, () => '/assets/board.glb',
-        {
-            //  onLoad: ({ scene }: { scene: NgtGroup }) => {
-            //    if (scene['add'] !== undefined) {
-            //      scene.add(new THREE.AxesHelper(200));
-            //    }
-            //  }
-        }
-    );
+  board = injectLoader(
+    () => GLTFLoader, () => '/assets/board.glb',
+    {
+      //  onLoad: ({ scene }: { scene: NgtGroup }) => {
+      //    if (scene['add'] !== undefined) {
+      //      scene.add(new THREE.AxesHelper(200));
+      //    }
+      //  }
+    }
+  );
 }
 

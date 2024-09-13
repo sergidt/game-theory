@@ -24,6 +24,7 @@ extend({ Mesh, MeshPhysicalMaterial });
       @if (gltf(); as gltf) {
         <ngt-group [dispose]="null">
           <ngt-mesh [parameters]="position()"
+          (attached)="registerMesh($event)"
                     [castShadow]="true"
                     [receiveShadow]="true"
                     [geometry]="gltf.nodes.imagetostl_mesh0.geometry"
@@ -47,12 +48,7 @@ export class GamePieceComponent {
 
   protected game = inject(GameEngine);
 
-  protected gltf = injectLoader(
-    () => GLTFLoader, () => this.piece().path,
-    {
-      onLoad: (result: GLTFResult) => this.game.registerMesh(this.piece().characteristics, result.nodes.imagetostl_mesh0)
-    }
-  ) as Signal<GLTFResult>;
+  protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
 
   SelectionColor = SelectionColor;
 
@@ -74,5 +70,8 @@ export class GamePieceComponent {
   clicked(event: NgtThreeEvent<MouseEvent>) {
     event.stopPropagation();
     this.game.pieceSelectedByUser(this.piece());
+  }
+  registerMesh({ node }: { node: Mesh }) {
+    this.game.registerMesh(this.piece().characteristics, node);
   }
 }

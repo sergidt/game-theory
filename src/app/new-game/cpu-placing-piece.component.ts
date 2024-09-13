@@ -1,22 +1,20 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { DEPTH, Move } from '../definitions';
+import { Component, inject } from '@angular/core';
 import { GameEngine } from '../game-engine';
-import { minimaxPromisified } from '../minimax';
 
 @Component({
-    selector: 'cpu-placing-piece',
-    standalone: true,
-    imports: [
-        NgOptimizedImage
-    ],
-    template: `
+  selector: 'cpu-placing-piece',
+  standalone: true,
+  imports: [
+    NgOptimizedImage
+  ],
+  template: `
       <h4>The opponent is thinking about where to place the piece</h4>
       <img ngSrc="assets/thinking.png"
            width="140"
            height="140"/>
     `,
-    styles: `
+  styles: `
       :host {
         display: flex;
         flex-direction: column;
@@ -26,15 +24,6 @@ import { minimaxPromisified } from '../minimax';
       }
     `
 })
-export class CpuPlacingPieceComponent implements OnInit {
-    #game = inject(GameEngine);
-
-    ngOnInit() {
-        minimaxPromisified(this.#game.boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.#game.selectedPiece()?.characteristics)
-            .then(([move, value]: [Move | undefined, number]) => {
-                console.log(move);
-                //         if (move)
-                //             this.#game.move(move);
-            });
-    }
+export class CpuPlacingPieceComponent {
+  #game = inject(GameEngine);
 }

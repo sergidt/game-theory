@@ -1,6 +1,6 @@
-import { DEPTH, Move, PieceCharacteristics } from './definitions';
+import { CPU_THINKING_DELAY, DEPTH, Move, PieceCharacteristics } from './definitions';
 import { BoardController } from './game-engine';
-import { evaluateBoard, gameDraw, gameWinner, getPossibleMoves } from './game.utils';
+import { evaluateBoard, gameDraw, gameWinner, getPossibleMoves, shuffleArray } from './game.utils';
 
 export function minimax(boardController: BoardController, alpha: number, beta: number, maximizingPlayer: boolean, depth = DEPTH,
   piece?: PieceCharacteristics): [Move | undefined, number] {
@@ -13,7 +13,7 @@ export function minimax(boardController: BoardController, alpha: number, beta: n
 
   let value = maximizingPlayer ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
 
-  const possibleMoves = getPossibleMoves(boardController.board, piece);
+  const possibleMoves = shuffleArray<Move>(getPossibleMoves(boardController.board, piece));
 
   for (let i = 0; i < possibleMoves.length; i++) {
     boardController.move(possibleMoves[i]);
@@ -46,6 +46,6 @@ export function minimax(boardController: BoardController, alpha: number, beta: n
 
 // minimax as Promise
 export async function minimaxPromisified(...params: Parameters<typeof minimax>): Promise<[Move | undefined, number]> {
-  return new Promise(resolve => resolve(minimax(...params)));
+  return new Promise(resolve => setTimeout(() => resolve(minimax(...params)), CPU_THINKING_DELAY));
 }
 
