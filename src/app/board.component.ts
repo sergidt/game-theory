@@ -5,10 +5,9 @@ import { NgtsEnvironment } from 'angular-three-soba/staging';
 import { AmbientLight, CylinderGeometry, Mesh, MeshStandardMaterial } from 'three';
 import { GLTFLoader } from 'three-stdlib';
 import { AvailablePositionComponent } from './available-position.component';
-import { PIECES, Position } from './definitions';
+import { PIECES } from './definitions';
 import { GameEngine } from './game-engine';
 import { GamePieceComponent } from './game-piece.component';
-import { getEmptyPositions } from './game.utils';
 
 extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
 
@@ -30,7 +29,7 @@ extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
 
         @if (game.showAvailablePositions()) {
           <ngt-group>
-            @for (position of availablePositions; track $index) {
+            @for (position of game.userAvailablePositions(); track $index) {
               <available-position [position]="position"/>
             }
           </ngt-group>
@@ -48,7 +47,7 @@ export class Board {
   pieces = PIECES;
   game = inject(GameEngine);
 
-  availablePositions: Array<Position> = getEmptyPositions(this.game.boardController.board);
+  //availablePositions: Array<Position> = getEmptyPositions(this.game.boardController.board);
 
   board = injectLoader(
     () => GLTFLoader, () => '/assets/board.glb',

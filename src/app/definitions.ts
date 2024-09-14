@@ -19,22 +19,22 @@ export const CPU_THINKING_DELAY = 1000;
 //  Piece Characteristics:
 
 export const PiecesCharacteristics = {
-  15: 'Big Dark Square Hole', // 1111
-  14: 'Big Dark Square No Hole', // 1110
-  13: 'Big Dark Round Hole', // 1101
-  12: 'Big Dark Round No Hole', // 1100
-  11: 'Big Light Square Hole', // 1011
-  10: 'Big Light Square No Hole',  // 1010
-  9: 'Big Light Round Hole', // 1001
-  8: 'Big Light Round No Hole', // 1000
-  7: 'Small Dark Square Hole', // 0111
-  6: 'Small Dark Square No Hole', // 0110
-  5: 'Small Dark Round Hole', // 0101
-  4: 'Small Dark Round No Hole', // 0100
-  3: 'Small Light Square Hole',// 0011
-  2: 'Small Light Square No Hole', // 0010
-  1: 'Small Light Round Hole', // 0001
-  0: 'Small Light Round No Hole', // 0000
+  15: 'Big dark squared with hole', // 1111
+  14: 'Big dark squared no hole', // 1110
+  13: 'Big dark rounded with hole', // 1101
+  12: 'Big dark rounded no hole', // 1100
+  11: 'Big light squared with hole', // 1011
+  10: 'Big light squared no hole',  // 1010
+  9: 'Big light rounded with hole', // 1001
+  8: 'Big light rounded no hole', // 1000
+  7: 'Small dark squared with hole', // 0111
+  6: 'Small dark squared no hole', // 0110
+  5: 'Small dark rounded with hole', // 0101
+  4: 'Small dark rounded no hole', // 0100
+  3: 'Small light squared with hole',// 0011
+  2: 'Small light squared no hole', // 0010
+  1: 'Small light rounded with hole', // 0001
+  0: 'Small light rounded no hole', // 0000
 };
 
 export let COUNTER = 0;

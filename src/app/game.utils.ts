@@ -116,7 +116,7 @@ export function printBoard(board: Board) {
   );
 }
 
-export const describePiece = (p: Piece) => PiecesCharacteristics[p.characteristics];
+export const describePiece = (p: PieceCharacteristics) => PiecesCharacteristics[p];
 
 export const shuffleArray = <T>(array: T[]) => {
   return array.map((a) => ({ sort: Math.random(), value: a }))
@@ -130,3 +130,11 @@ export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
     return { ...result, [groupKey]: [...(result[groupKey] || []), currentValue] };
   }, {} as Record<string, T[]>);
 }
+
+
+export function randomSleep() {
+  const rand = Math.random();
+  const sleep = Math.min(rand * 5000, 3000);
+  return new Promise(resolve => setTimeout(resolve, sleep));
+}
+

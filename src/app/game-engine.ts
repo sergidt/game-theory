@@ -4,8 +4,8 @@ import anime from 'animejs';
 import { toObservableSignal } from 'ngxtension/to-observable-signal';
 import { tap } from 'rxjs';
 import { Mesh } from 'three';
-import { Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, Move, Piece, PieceCharacteristics, Position } from './definitions';
-import { deepClone, describePiece, evaluateBoard, gameWinner, getAvailablePieces, getPossibleMoves, shuffleArray } from './game.utils';
+import { Board, DEPTH, EMPTY, GameAction, GameActions, GameState, GameStates, GameStateTransitions, Move, PieceCharacteristics, Position } from './definitions';
+import { deepClone, describePiece, evaluateBoard, gameWinner, getAvailablePieces, getEmptyPositions, getPossibleMoves, randomSleep, shuffleArray } from './game.utils';
 import { minimaxPromisified } from './minimax';
 
 @Injectable({ providedIn: 'root' })
@@ -84,7 +84,7 @@ export class GameEngine {
   #renderedMeshes: Map<PieceCharacteristics, Mesh> = new Map<PieceCharacteristics, Mesh>();
   #destroyRef = inject(DestroyRef);
   pointedPiece = signal<PieceCharacteristics | null>(null);
-  selectedPiece = signal<Piece | null>(null);
+  selectedPiece = signal<PieceCharacteristics | null>(null);
   availablePositionHovered = signal<Position | null>(null);
   showAvailablePositions = computed(() => this.currentState() === GameStates.UserPlacingPiece);
 
@@ -92,9 +92,14 @@ export class GameEngine {
     this.#cpuStatesManagement();
 
     effect(() => {
-      console.log(`[Game Engine] -> selected piece: ${this.selectedPiece()?.characteristics || ''}`, this.selectedPiece() ?
+      console.log(`[Game Engine] -> selected piece: ${this.selectedPiece() || ''}`, this.selectedPiece() ?
         describePiece(this.selectedPiece()!) : 'None');
     });
+  }
+
+  describeSelectedPiece() {
+    const selectedPiece = this.selectedPiece();
+    return selectedPiece ? describePiece(selectedPiece) : 'No selected piece';
   }
 
   userPointingPiece(characteristics: PieceCharacteristics) {
@@ -109,26 +114,24 @@ export class GameEngine {
     }
   }
 
-  pieceSelectedByUser(piece: Piece) {
+  pieceSelectedByUser(piece: PieceCharacteristics) {
     if (this.currentState() === GameStates.UserSelectingPiece) {
       this.toggleSelection(piece);
       this.nextState(GameActions.PieceSelected);
     }
   }
 
-  #pieceSelectedByCPU(piece: Piece) {
-    if (this.currentState() === GameStates.CPUSelectingPiece) {
+  private pieceSelectedByCPU(piece: PieceCharacteristics) {
+    if (this.currentState() === GameStates.CPUSelectingPiece)
       this.toggleSelection(piece);
-      this.nextState(GameActions.PieceSelected);
-    }
   }
 
   registerMesh(piece: PieceCharacteristics, mesh: Mesh) {
     this.#renderedMeshes.set(piece, mesh);
   }
 
-  toggleSelection(piece: Piece) {
-    this.selectedPiece.set(this.selectedPiece()?.characteristics === piece.characteristics ? null : piece);
+  toggleSelection(piece: PieceCharacteristics) {
+    this.selectedPiece.set(this.selectedPiece() === piece ? null : piece);
   }
 
   hoverAvailablePosition(position: Position | null) {
@@ -168,6 +171,8 @@ export class GameEngine {
   currentState = signal<GameState>(GameStates.NewGame);
 
   playing = computed(() => !['NewGame', 'Draw', 'CPUWins', 'UserWins'].includes(this.currentState()));
+
+  userAvailablePositions = computed(() => this.currentState() === 'UserPlacingPiece' ? getEmptyPositions(this.boardController.board) : []);
 
   #allowedTransitions: GameStateTransitions = {
     [GameStates.NewGame]: {
@@ -242,7 +247,7 @@ export class GameEngine {
   #manageCPUStates(state: GameState) {
     switch (state) {
       case GameStates.CPUPlacingPiece:
-        minimaxPromisified(this.boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.selectedPiece()?.characteristics)
+        minimaxPromisified(this.boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.selectedPiece() || undefined)
           .then(([move, value]: [Move | undefined, number]) => {
             if (move) {
               this.move(move)
@@ -255,10 +260,27 @@ export class GameEngine {
         break;
 
       case GameStates.CPUSelectingPiece:
-        this.#cpuSelectingNextUserPiece()
-          .then(piece => this.#pieceSelectedByCPU());
+        this.#cpuSelectingPieceStateManagement();
+        /* this.#cpuSelectingNextUserPiece()
+           .then(piece => {
+             console.log(11111);
+             return delayedPromise(this.pieceSelectedByCPU, piece);
+
+           })
+           .then(([value]) => {
+             console.log(value);// this.nextState(GameActions.PieceSelected);
+           });
+           */
         break;
     }
+  }
+
+  async #cpuSelectingPieceStateManagement() {
+    const piece = await this.#cpuSelectingNextUserPiece();
+    await randomSleep();
+    this.pieceSelectedByCPU(piece);
+    this.nextState(GameActions.PieceSelected);
+    console.log(piece);
   }
 
   getCurrentStateAvailableActions = () => this.#allowedTransitions[this.currentState()];

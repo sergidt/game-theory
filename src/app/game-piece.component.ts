@@ -53,7 +53,7 @@ export class GamePieceComponent {
   SelectionColor = SelectionColor;
 
   protected piecePointed = computed(() => this.game.pointedPiece() === this.piece().characteristics);
-  protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece()?.characteristics);
+  protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece());
   protected position = computed(() => ({ position: this.piece().position }));
   protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
 
@@ -69,7 +69,7 @@ export class GamePieceComponent {
 
   clicked(event: NgtThreeEvent<MouseEvent>) {
     event.stopPropagation();
-    this.game.pieceSelectedByUser(this.piece());
+    this.game.pieceSelectedByUser(this.piece().characteristics);
   }
   registerMesh({ node }: { node: Mesh }) {
     this.game.registerMesh(this.piece().characteristics, node);
