@@ -79,6 +79,7 @@ export class BoardController {
 
 @Injectable({ providedIn: 'root' })
 export class GameEngine {
+
   boardController = inject(BoardController);
 
   #renderedMeshes: Map<PieceCharacteristics, Mesh> = new Map<PieceCharacteristics, Mesh>();
@@ -143,7 +144,7 @@ export class GameEngine {
     this.pointedPiece.set(null);
   }
 
-  move(move: Move): Promise<void> {
+  #move(move: Move): Promise<void> {
     this.boardController.move(move);
     const position: [number, number, number] = this.boardController.getCoordinates(move.row, move.col) as [number, number, number];
 
@@ -157,6 +158,15 @@ export class GameEngine {
       direction: "normal",
     })
       .finished;
+  }
+
+  async userMove(move: Position) {
+    move.piece = this.selectedPiece() as PieceCharacteristics;
+    await this.#move(move)
+    this.deselectedAnyPiece();
+
+    // TODO: manage game state
+    this.nextState(GameActions.PiecePlaced);
   }
 
   /**
@@ -225,12 +235,7 @@ export class GameEngine {
           this.boardController.undo();
         });
 
-        // console.log('>>>>>>>>>>>>>>>>>>');
-        // console.log(possibleMoves.sort((a, b) => a.value - b.value));
-        // console.log(this.boardController.board);
-
-        resolve(possibleMoves.sort((a, b) => a.value - b.value).find(_ => _.win)!.piece as PieceCharacteristics);
-
+        resolve(possibleMoves.sort((a, b) => a.value - b.value).find(_ => !_.win)!.piece as PieceCharacteristics);
       }
     });
   }
@@ -250,7 +255,7 @@ export class GameEngine {
         minimaxPromisified(this.boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.selectedPiece() || undefined)
           .then(([move, value]: [Move | undefined, number]) => {
             if (move) {
-              this.move(move)
+              this.#move(move)
                 .then(() => {
                   this.deselectedAnyPiece();
                   this.nextState(GameActions.PiecePlaced);

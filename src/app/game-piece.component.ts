@@ -71,6 +71,7 @@ export class GamePieceComponent {
     event.stopPropagation();
     this.game.pieceSelectedByUser(this.piece().characteristics);
   }
+
   registerMesh({ node }: { node: Mesh }) {
     this.game.registerMesh(this.piece().characteristics, node);
   }
