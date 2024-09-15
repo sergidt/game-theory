@@ -9,7 +9,7 @@ import { GameEngine } from '../game-engine';
     NgOptimizedImage
   ],
   template: `
-      <h4>The opponent is thinking about where to place the piece</h4>
+      <h3>The opponent is thinking about where to place the piece</h3>
       <img ngSrc="assets/thinking.png"
            width="140"
            height="140"/>

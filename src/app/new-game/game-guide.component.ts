@@ -7,17 +7,18 @@ import { UserPlacingPieceComponent } from './user-placing-piece.component';
 import { UserSelectingPieceComponent } from './user-selecting-piece.component';
 
 @Component({
-    selector: 'game-guide',
-    standalone: true,
-    imports: [
-        UserSelectingPieceComponent,
-        CpuSelectingPieceComponent,
-        UserPlacingPieceComponent,
-        CpuPlacingPieceComponent,
-    ],
-    template: `
-      <h2>Game guide</h2>
-      <div>{{ game.currentState() }}</div>
+  selector: 'game-guide',
+  standalone: true,
+  imports: [
+    UserSelectingPieceComponent,
+    CpuSelectingPieceComponent,
+    UserPlacingPieceComponent,
+    CpuPlacingPieceComponent,
+  ],
+  template: `
+      <h2>Game guide   - {{ game.currentState() }}</h2>
+
+      <div class="content">
       @switch (game.currentState()) {
         @case ('NewGame') {
           <div>Are you ready to start a new game?</div>
@@ -45,8 +46,9 @@ import { UserSelectingPieceComponent } from './user-selecting-piece.component';
           <div>It's a draw!</div>
         }
       }
+      </div>
     `,
-    styles: `
+  styles: `
       :host {
         display: flex;
         flex-direction: column;
@@ -55,6 +57,6 @@ import { UserSelectingPieceComponent } from './user-selecting-piece.component';
     `
 })
 export class GameGuideComponent {
-    protected readonly game = inject(GameEngine);
-    protected readonly GameActions = GameActions;
+  protected readonly game = inject(GameEngine);
+  protected readonly GameActions = GameActions;
 }

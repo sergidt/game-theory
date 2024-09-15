@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import { extend, injectLoader, NgtArgs, NgtSelection } from 'angular-three';
 import { NgtsCameraControls, NgtsOrbitControls } from 'angular-three-soba/controls';
 import { NgtsEnvironment } from 'angular-three-soba/staging';
 import { AmbientLight, CylinderGeometry, Mesh, MeshStandardMaterial } from 'three';
 import { GLTFLoader } from 'three-stdlib';
-import { AvailablePositionComponent } from './available-position.component';
+import { PositionSlotComponent } from './available-position.component';
 import { PIECES } from './definitions';
 import { GameEngine } from './game-engine';
 import { GamePieceComponent } from './game-piece.component';
@@ -30,7 +30,7 @@ extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
         @if (game.showAvailablePositions()) {
           <ngt-group>
             @for (position of game.userAvailablePositions(); track $index) {
-              <available-position [position]="position"/>
+              <position-slot [position]="position"/>
             }
           </ngt-group>
         }
@@ -39,13 +39,15 @@ extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
       <ngts-orbit-controls/>
       <ngts-environment [options]="{preset: 'city'}"/>
     `,
-  imports: [NgtArgs, NgtsOrbitControls, NgtsEnvironment, NgtSelection, NgtsCameraControls, GamePieceComponent, AvailablePositionComponent],
+  imports: [NgtArgs, NgtsOrbitControls, NgtsEnvironment, NgtSelection, NgtsCameraControls, GamePieceComponent, PositionSlotComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Board {
   pieces = PIECES;
   game = inject(GameEngine);
+
+  showPositionSlots = computed(() => ['UserPlacingPiece', 'UserWon', 'CPUWon'].includes(this.game.currentState()));
 
   board = injectLoader(
     () => GLTFLoader, () => '/assets/board.glb',

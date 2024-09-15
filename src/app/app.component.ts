@@ -34,18 +34,20 @@ import { GameGuideComponent } from './new-game/game-guide.component';
 
       <div class="top-bar">
         <div class="title">Quarto</div>
+        <div class="buttons">
         <button [style.margin-top.px]="15"
                 (click)="showDialog.set('Instructions')">How to play
         </button>
         <button [style.margin-top.px]="15"
                 (click)="showDialog.set('About')">About
         </button>
+        </div>
       </div>
 
       <div class="main-content">
         <ngt-canvas #canvas
                     [sceneGraph]="sceneGraph"
-                    [camera]="{position: [8,-6,6], fov: 60}"/>
+                    [camera]="{position: [8,-6,6], fov: 40}"/>
 
         <div class="guide-panel">
           <game-guide/>

@@ -6,7 +6,7 @@ import { GameEngine } from '../game-engine';
   standalone: true,
   imports: [],
   template: `
-  <p>AI algorithm chose this piece for you:</p>
+  <h3>AI algorithm chose this piece for you:</h3>
 <p class="piece-description">{{game.describeSelectedPiece()}}</p>
       <p>
         Place this piece, selecting one available position. Please, click over any pink disk </p>

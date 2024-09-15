@@ -9,13 +9,13 @@ export const DiscArgs = [17, 17, 10, 100];
 extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
 
 @Component({
-  selector: 'available-position',
+  selector: 'position-slot',
   standalone: true,
   template: `
       <ngt-mesh [parameters]="{rotation: [0, 0, 0], position: position().coords}"
-                (pointerover)="availablePositionPointerOver($event)"
-                (pointerout)="availablePositionPointerOut($event)"
-                (click)="availablePositionClicked($event)">
+                (pointerover)="slotPointerOver($event)"
+                (pointerout)="slotPointerOut($event)"
+                (click)="slotClicked($event)">
         <ngt-mesh-standard-material [color]="this.game.availablePositionHovered() === position() ? 'indianred': 'pink'"/>
         <ngt-cylinder-geometry *args="discArgs"/>
       </ngt-mesh>
@@ -24,25 +24,23 @@ extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AvailablePositionComponent {
-
-  position = input.required<Position>();
-
+export class PositionSlotComponent {
   game = inject(GameEngine);
 
+  position = input.required<Position>();
   discArgs = DiscArgs;
 
-  availablePositionPointerOver(event: NgtThreeEvent<MouseEvent>) {
+  slotPointerOver(event: NgtThreeEvent<MouseEvent>) {
     event.stopPropagation();
     this.game.hoverAvailablePosition(this.position());
   }
 
-  availablePositionPointerOut(event: NgtThreeEvent<MouseEvent>) {
+  slotPointerOut(event: NgtThreeEvent<MouseEvent>) {
     event.stopPropagation();
     this.game.hoverAvailablePosition(null);
   }
 
-  availablePositionClicked(event: NgtThreeEvent<MouseEvent>) {
+  slotClicked(event: NgtThreeEvent<MouseEvent>) {
     event.stopPropagation();
     this.game.userMove(this.position())
   }
