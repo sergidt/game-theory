@@ -1,10 +1,10 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, signal, WritableSignal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NgtCanvas } from 'angular-three';
-import { AboutComponent } from './about.component';
-import { Board } from './board.component';
-import { GameDialogComponent } from './dialog.component';
-import { GameDescriptionComponent } from './game-description.component';
+import { BoardComponent } from './3d-components/board.component';
+import { AboutComponent } from './dialogs/about.component';
+import { GameDialogComponent } from './dialogs/dialog.component';
+import { GameDescriptionComponent } from './dialogs/game-description.component';
 import { GameGuideComponent } from './game-guide/game-guide.component';
 
 @Component({
@@ -63,6 +63,6 @@ import { GameGuideComponent } from './game-guide/game-guide.component';
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AppComponent {
-    protected sceneGraph = Board;
+    protected sceneGraph = BoardComponent;
     protected showDialog: WritableSignal<'None' | 'Instructions' | 'About'> = signal('None');
 }

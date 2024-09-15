@@ -4,8 +4,8 @@ import { NgtsCameraControls, NgtsOrbitControls } from 'angular-three-soba/contro
 import { NgtsEnvironment } from 'angular-three-soba/staging';
 import { AmbientLight, CylinderGeometry, Mesh, MeshStandardMaterial } from 'three';
 import { GLTFLoader } from 'three-stdlib';
-import { PIECES } from './definitions';
-import { GameEngine } from './game-engine';
+import { PIECES } from '../definitions';
+import { GameEngine } from '../game-engine';
 import { GamePieceComponent } from './game-piece.component';
 import { PositionSlotComponent } from './position-slot.component';
 
@@ -27,7 +27,7 @@ extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
           }
         </ngt-group>
 
-        @if (game.showAvailablePositions()) {
+        @if (showPositionSlots()) {
           <ngt-group>
             @for (position of game.userAvailablePositions(); track $index) {
               <position-slot [position]="position"/>
@@ -43,21 +43,12 @@ extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Board {
+export class BoardComponent {
     pieces = PIECES;
     game = inject(GameEngine);
 
     showPositionSlots = computed(() => ['UserPlacingPiece', 'UserWon', 'CPUWon'].includes(this.game.currentState()));
 
-    board = injectLoader(
-        () => GLTFLoader, () => '/assets/board.glb',
-        {
-            //  onLoad: ({ scene }: { scene: NgtGroup }) => {
-            //    if (scene['add'] !== undefined) {
-            //      scene.add(new THREE.AxesHelper(200));
-            //    }
-            //  }
-        }
-    );
+    board = injectLoader(() => GLTFLoader, () => '/assets/board.glb');
 }
 
