@@ -4,17 +4,17 @@ import { NgtsCameraControls, NgtsOrbitControls } from 'angular-three-soba/contro
 import { NgtsEnvironment } from 'angular-three-soba/staging';
 import { AmbientLight, CylinderGeometry, Mesh, MeshStandardMaterial } from 'three';
 import { GLTFLoader } from 'three-stdlib';
-import { PositionSlotComponent } from './available-position.component';
 import { PIECES } from './definitions';
 import { GameEngine } from './game-engine';
 import { GamePieceComponent } from './game-piece.component';
+import { PositionSlotComponent } from './position-slot.component';
 
 extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
 
 @Component({
-  selector: 'board',
-  standalone: true,
-  template: `
+    selector: 'board',
+    standalone: true,
+    template: `
       <ngt-ambient-light [intensity]="1"/>
       <ngt-group #group
                  [parameters]="{scale: 0.020, rotation: [1.57, 3.14, 0.93]}">
@@ -39,25 +39,25 @@ extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
       <ngts-orbit-controls/>
       <ngts-environment [options]="{preset: 'city'}"/>
     `,
-  imports: [NgtArgs, NgtsOrbitControls, NgtsEnvironment, NgtSelection, NgtsCameraControls, GamePieceComponent, PositionSlotComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [NgtArgs, NgtsOrbitControls, NgtsEnvironment, NgtSelection, NgtsCameraControls, GamePieceComponent, PositionSlotComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Board {
-  pieces = PIECES;
-  game = inject(GameEngine);
+    pieces = PIECES;
+    game = inject(GameEngine);
 
-  showPositionSlots = computed(() => ['UserPlacingPiece', 'UserWon', 'CPUWon'].includes(this.game.currentState()));
+    showPositionSlots = computed(() => ['UserPlacingPiece', 'UserWon', 'CPUWon'].includes(this.game.currentState()));
 
-  board = injectLoader(
-    () => GLTFLoader, () => '/assets/board.glb',
-    {
-      //  onLoad: ({ scene }: { scene: NgtGroup }) => {
-      //    if (scene['add'] !== undefined) {
-      //      scene.add(new THREE.AxesHelper(200));
-      //    }
-      //  }
-    }
-  );
+    board = injectLoader(
+        () => GLTFLoader, () => '/assets/board.glb',
+        {
+            //  onLoad: ({ scene }: { scene: NgtGroup }) => {
+            //    if (scene['add'] !== undefined) {
+            //      scene.add(new THREE.AxesHelper(200));
+            //    }
+            //  }
+        }
+    );
 }
 
