@@ -1,5 +1,5 @@
+import { BoardController, EMPTY_BOARD } from './board.controller';
 import { Board, EMPTY, Move } from './definitions';
-import { BoardController, EMPTY_BOARD } from './game-engine';
 import { deepClone, getAvailablePieces, getEmptyPositions, getPossibleMoves } from './game.utils';
 
 describe('Border Controller', () => {
