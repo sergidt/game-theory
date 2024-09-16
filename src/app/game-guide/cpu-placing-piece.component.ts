@@ -3,18 +3,16 @@ import { Component, inject } from '@angular/core';
 import { GameEngine } from '../game-engine';
 
 @Component({
-  selector: 'cpu-placing-piece',
-  standalone: true,
-  imports: [
-    NgOptimizedImage
-  ],
-  template: `
+    selector: 'cpu-placing-piece',
+    standalone: true,
+    imports: [NgOptimizedImage],
+    template: `
       <h3>The opponent is thinking about where to place the piece</h3>
       <img ngSrc="assets/thinking.png"
            width="140"
            height="140"/>
     `,
-  styles: `
+    styles: `
       :host {
         display: flex;
         flex-direction: column;
@@ -25,5 +23,5 @@ import { GameEngine } from '../game-engine';
     `
 })
 export class CpuPlacingPieceComponent {
-  #game = inject(GameEngine);
+    #game = inject(GameEngine);
 }

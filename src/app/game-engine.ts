@@ -13,8 +13,7 @@ import { minimaxPromisified } from './minimax';
 
 @Injectable({ providedIn: 'root' })
 export class GameEngine {
-    boardController = inject(BoardController);
-
+    #boardController = inject(BoardController);
     #renderedMeshes: Map<PieceCharacteristics, Mesh> = new Map<PieceCharacteristics, Mesh>();
     #destroyRef = inject(DestroyRef);
     pointedPiece = signal<PieceCharacteristics | null>(null);
@@ -37,15 +36,13 @@ export class GameEngine {
     }
 
     userPointingPiece(characteristics: PieceCharacteristics) {
-        if (this.currentState() === GameStates.UserSelectingPiece) {
+        if (this.currentState() === GameStates.UserSelectingPiece)
             this.pointedPiece.set(characteristics);
-        }
     }
 
     piecePointedOut() {
-        if (this.currentState() === GameStates.UserSelectingPiece) {
+        if (this.currentState() === GameStates.UserSelectingPiece)
             this.pointedPiece.set(null);
-        }
     }
 
     pieceSelectedByUser(piece: PieceCharacteristics) {
@@ -60,17 +57,11 @@ export class GameEngine {
             this.toggleSelection(piece);
     }
 
-    registerMesh(piece: PieceCharacteristics, mesh: Mesh) {
-        this.#renderedMeshes.set(piece, mesh);
-    }
+    registerMesh = (piece: PieceCharacteristics, mesh: Mesh) => this.#renderedMeshes.set(piece, mesh);
 
-    toggleSelection(piece: PieceCharacteristics) {
-        this.selectedPiece.set(this.selectedPiece() === piece ? null : piece);
-    }
+    toggleSelection = (piece: PieceCharacteristics) => this.selectedPiece.set(this.selectedPiece() === piece ? null : piece);
 
-    hoverAvailablePosition(position: Position | null) {
-        this.availablePositionHovered.set(position);
-    }
+    hoverAvailablePosition = (position: Position | null) => this.availablePositionHovered.set(position);
 
     deselectedAnyPiece() {
         this.selectedPiece.set(null);
@@ -78,8 +69,8 @@ export class GameEngine {
     }
 
     #move(move: Move): Promise<void> {
-        this.boardController.move(move);
-        const position: [number, number, number] = this.boardController.getCoordinates(move.row, move.col) as [number, number, number];
+        this.#boardController.move(move);
+        const position: [number, number, number] = this.#boardController.getCoordinates(move.row, move.col) as [number, number, number];
 
         return anime({
             targets: [this.#renderedMeshes.get(move.piece as PieceCharacteristics)!.position],
@@ -101,7 +92,7 @@ export class GameEngine {
     }
 
     #evaluateBoardAndAct() {
-        const boardEvaluation = this.boardController.evaluateBoard();
+        const boardEvaluation = this.#boardController.evaluateBoard();
 
         if (boardEvaluation.draw)
             this.nextState(GameActions.DrawPiece);
@@ -121,7 +112,7 @@ export class GameEngine {
 
     currentState = signal<GameState>(GameStates.NewGame);
 
-    userAvailablePositions = computed(() => this.currentState() === 'UserPlacingPiece' ? getEmptyPositions(this.boardController.board) : []);
+    userAvailablePositions = computed(() => this.currentState() === 'UserPlacingPiece' ? getEmptyPositions(this.#boardController.board) : []);
 
     #allowedTransitions: GameStateTransitions = {
         [GameStates.NewGame]: {
@@ -155,23 +146,23 @@ export class GameEngine {
     };
 
     /*
-    It is not a perfomant algorithm
+    It is not a performant algorithm
     */
     #cpuSelectingNextUserPiece(): Promise<PieceCharacteristics> {
         return new Promise(resolve => {
-            const availablePieces = this.boardController.getAvailablePieces();
+            const availablePieces = this.#boardController.getAvailablePieces();
 
             if (availablePieces.length > 13) // less than 3 pieces are placed, impossible to win, yet
                 resolve(shuffleArray(availablePieces)[0]);
             else {
-                const possibleMoves: Array<Move & { win: boolean; value: number; }> = this.boardController.getPossibleMoves()
+                const possibleMoves: Array<Move & { win: boolean; value: number; }> = this.#boardController.getPossibleMoves()
                                                                                           .map(_ => ({ ..._, value: -1, win: false }));
 
                 possibleMoves.forEach(move => {
-                    const board = this.boardController.move(move);
+                    const board = this.#boardController.move(move);
                     move.value = evaluateBoard(board);
                     move.win = gameWinner(board).win;
-                    this.boardController.undo();
+                    this.#boardController.undo();
                 });
 
                 resolve(possibleMoves.sort((a, b) => a.value - b.value).find(_ => !_.win)!.piece as PieceCharacteristics);
@@ -191,7 +182,7 @@ export class GameEngine {
     #manageCPUStates(state: GameState) {
         switch (state) {
             case GameStates.CPUPlacingPiece:
-                minimaxPromisified(this.boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.selectedPiece() || undefined)
+                minimaxPromisified(this.#boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.selectedPiece() || undefined)
                     .then(([move,]: [Move | undefined, number]) => {
                         if (move) {
                             this.#move(move)
@@ -217,10 +208,8 @@ export class GameEngine {
         console.log('selected piece by cpu', piece, describePiece(piece));
     }
 
-    getCurrentStateAvailableActions = () => this.#allowedTransitions[this.currentState()];
-
     nextState(action: GameAction) {
-        const currentStateActions = this.getCurrentStateAvailableActions();
+        const currentStateActions = this.#allowedTransitions[this.currentState()];
 
         if (!currentStateActions)
             throw new Error(`This action cannot be applied to the current state: ${ this.currentState() }`);

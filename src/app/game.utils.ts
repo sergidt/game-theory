@@ -6,16 +6,26 @@ export function deepClone<T>(object: T): T {
     return JSON.parse(JSON.stringify(object));
 }
 
-export const getRows = (board: Board) => Array.from(new Array(4), (_, i) => board.slice(i * 4, i * 4 + 4));
-export const getColumns = (board: Board) => Array.from(new Array(4), (_, i) => [board[i], board[i + 4], board[i + 8], board[i + 12]]);
-export const getDiagonal1 = (board: Board) => [board[0], board[5], board[10], board[15]];
-export const getDiagonal2 = (board: Board) => [board[3], board[6], board[9], board[12]];
+const MATCHES = Array.from(new Array(4), (_, i) => new Array(i + 1).fill(1).join(''))
+                     .concat(Array.from(new Array(4), (_, i) => new Array(i + 1).fill('0').join('')));
+
+const getRows = (board: Board) => Array.from(new Array(4), (_, i) => board.slice(i * 4, i * 4 + 4));
+
+const getColumns = (board: Board) => Array.from(new Array(4), (_, i) => [board[i], board[i + 4], board[i + 8], board[i + 12]]);
+
+const getDiagonal1 = (board: Board) => [board[0], board[5], board[10], board[15]];
+
+const getDiagonal2 = (board: Board) => [board[3], board[6], board[9], board[12]];
+
+const getFilledPositions = (positions: Position[]) => positions.filter(p => p.piece !== EMPTY);
+
+const number2binary = (number: number) => (number >>> 0).toString(2).padStart(4, '0');
+
+const winningLines = (board: Board) => getRows(board).concat(getColumns(board)).concat([getDiagonal1(board)], [getDiagonal2(board)]);
 
 export const getEmptyPositions = (board: Board) => board.filter(p => p.piece === EMPTY);
 
-export const getFilledPositions = (positions: Position[]) => positions.filter(p => p.piece !== EMPTY);
-
-export const number2binary = (number: number) => (number >>> 0).toString(2).padStart(4, '0');
+export const describePiece = (p: PieceCharacteristics) => PiecesCharacteristics[p];
 
 export function getSingleCharacteristic(piece: Piece, characteristic: 'Size' | 'Colour' | 'Shape' | 'Hole'): 0 | 1 {
     const characteristicValue = Number(number2binary(piece.characteristics).at(CharacteristicIndices[characteristic])!);
@@ -35,9 +45,6 @@ export function getPossibleMoves(board: Board, withPiece?: PieceCharacteristics)
     return availableMoves;
 }
 
-const MATCHES = Array.from(new Array(4), (_, i) => new Array(i + 1).fill(1).join(''))
-                     .concat(Array.from(new Array(4), (_, i) => new Array(i + 1).fill('0').join('')));
-
 export function evaluatePositions(positions: Position[]) {
     const features = featuresByPosition(positions);
     const coincidences = features.reduce((acc, cur) => acc + (MATCHES.includes(cur) ? 1 : 0), 0);
@@ -45,29 +52,20 @@ export function evaluatePositions(positions: Position[]) {
 }
 
 export function evaluateBoard(board: Board): number {
-    if (gameWinner(board).win) return 1000;
-    else {
-        const rows = getRows(board);
-        const columns = getColumns(board);
-        const diagonal1 = getDiagonal1(board);
-        const diagonal2 = getDiagonal2(board);
-
-        return rows.concat(columns).concat([diagonal1], [diagonal2])
-                   .map(pieces => evaluatePositions(pieces)).reduce((acc, cur) => acc + cur, 0);
-    }
+    return gameWinner(board).win
+        ? 1000
+        : winningLines(board).map(pieces => evaluatePositions(pieces)).reduce((acc, cur) => acc + cur, 0);
 }
 
-export function featuresByPosition(positions: Position[]) {
+function featuresByPosition(positions: Position[]) {
     const filledPositions = getFilledPositions(positions);
     const concatenated = filledPositions.map(p => number2binary(p.piece)).join('');
-    const featuresByPosition = [];
+    const features = [];
 
     for (let i = 0; i < 4; i++) {
-        featuresByPosition.push(
-            filledPositions.reduce((acc, cur, currentIndex) => acc += concatenated[currentIndex * 4 + i], '')
-        );
+        features.push(filledPositions.reduce((acc, cur, currentIndex) => acc += concatenated[currentIndex * 4 + i], ''));
     }
-    return featuresByPosition;
+    return features;
 }
 
 export function getAvailablePieces(board: Board): Array<PieceCharacteristics> {
@@ -78,33 +76,22 @@ export function getAvailablePieces(board: Board): Array<PieceCharacteristics> {
 }
 
 export function gameWinner(board: Board): WinningLine {
-    const rows = getRows(board);
-    const columns = getColumns(board);
-    const diagonal1 = getDiagonal1(board);
-    const diagonal2 = getDiagonal2(board);
-    const winningLines = rows.concat(columns).concat([diagonal1], [diagonal2]);
-
-    return winningLines
+    return winningLines(board)
         .reduce((acc: WinningLine, line: Position[], currentIndex) => {
-            if (acc.win) {
-                return acc as WinningLine;
-            } else {
+            if (acc.win) return acc as WinningLine;
+            else {
                 const features = featuresByPosition(getFilledPositions(line));
-                if (features[0].length === 4) { // Skip lines with less than 4, that means not all pieces are placed in the line
-
+                if (features[0].length === 4) { // Skip lines with less than 4, meaning not all pieces are placed in the line
                     return (features.includes('1111') || features.includes('0000')) // Winning line must have 4 pieces with some characteristic in common
                         ? { win: true, positions: line, line: WINNING_LINE_NAMES[currentIndex] }
                         : acc as WinningLine;
-                } else {
+                } else
                     return acc as WinningLine;
-                }
             }
         }, { win: false, positions: [], line: undefined });
 }
 
-export function gameDraw(board: Board): boolean {
-    return board.every(p => p.piece !== EMPTY) && !gameWinner(board).win;
-}
+export const gameDraw = (board: Board) => board.every(p => p.piece !== EMPTY) && !gameWinner(board).win;
 
 export function printBoard(board: Board) {
     console.log(
@@ -113,17 +100,12 @@ export function printBoard(board: Board) {
     );
 }
 
-export const describePiece = (p: PieceCharacteristics) => PiecesCharacteristics[p];
+export const shuffleArray = <T>(array: T[]) => array.map((a) => ({ sort: Math.random(), value: a }))
+                                                    .sort((a, b) => a.sort - b.sort)
+                                                    .map((a) => a.value);
 
-export const shuffleArray = <T>(array: T[]) => {
-    return array.map((a) => ({ sort: Math.random(), value: a }))
-                .sort((a, b) => a.sort - b.sort)
-                .map((a) => a.value);
-};
-
-export function randomSleep() {
+export async function randomSleep() {
     const rand = Math.random();
     const sleep = Math.min(rand * 5000, 3000);
     return new Promise(resolve => setTimeout(resolve, sleep));
 }
-

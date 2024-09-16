@@ -2,7 +2,7 @@ import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject, input, Signal } fr
 import { extend, injectLoader, NgtArgs, NgtThreeEvent } from 'angular-three';
 import { Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import { GLTF, GLTFLoader } from 'three-stdlib';
-import { DarkColor, LightColor, Piece, SelectionColor } from '../definitions';
+import { DARK_COLOR, LIGHT_COLOR, Piece, SELECTION_COLOR } from '../definitions';
 import { GameEngine } from '../game-engine';
 import { getSingleCharacteristic } from '../game.utils';
 
@@ -50,12 +50,12 @@ export class GamePieceComponent {
 
     protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
 
-    SelectionColor = SelectionColor;
+    SelectionColor = SELECTION_COLOR;
 
     protected piecePointed = computed(() => this.game.pointedPiece() === this.piece().characteristics);
     protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece());
     protected position = computed(() => ({ position: this.piece().position }));
-    protected color = computed(() => [LightColor, DarkColor][getSingleCharacteristic(this.piece(), 'Colour')]);
+    protected color = computed(() => [LIGHT_COLOR, DARK_COLOR][getSingleCharacteristic(this.piece(), 'Colour')]);
 
     pointerOver(event: NgtThreeEvent<PointerEvent>) {
         event.stopPropagation();

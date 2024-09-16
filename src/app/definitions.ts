@@ -1,8 +1,8 @@
 import { NgtVector3 } from 'angular-three';
 
-export const DarkColor = '#2F5CBB';
-export const LightColor = '#ffe7e2';
-export const SelectionColor = '#ff9e42';
+export const DARK_COLOR = '#2F5CBB';
+export const LIGHT_COLOR = '#ffe7e2';
+export const SELECTION_COLOR = '#ff9e42';
 
 // the minimax algorithm takes only few ms to return any result. We want to simulate a normal behavior applying this delay
 export const CPU_THINKING_DELAY = 1000;
@@ -37,7 +37,6 @@ export const PiecesCharacteristics = {
     0: 'Small light rounded no hole', // 0000
 };
 
-export let COUNTER = 0;
 export const DEPTH = 2;
 export const WINNING_LINE_NAMES = ['Row 1', 'Row 2', 'Row 3', 'Row 4', 'Column 1', 'Column 2', 'Column 3', 'Column 4', 'Diagonal 1',
                                    'Diagonal 2'] as const;
