@@ -59,7 +59,9 @@ export class GameEngine {
 
     registerMesh = (piece: PieceCharacteristics, mesh: Mesh) => this.#renderedMeshes.set(piece, mesh);
 
-    toggleSelection = (piece: PieceCharacteristics) => this.selectedPiece.set(this.selectedPiece() === piece ? null : piece);
+    toggleSelection(piece: PieceCharacteristics) {
+        this.selectedPiece.set(this.selectedPiece() === piece ? null : piece);
+    }
 
     hoverAvailablePosition = (position: Position | null) => this.availablePositionHovered.set(position);
 
@@ -189,7 +191,7 @@ export class GameEngine {
     #manageCPUStates(state: GameState) {
         switch (state) {
             case GameStates.CPUPlacingPiece:
-                minimaxPromisified(this.#boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.selectedPiece() || undefined)
+                minimaxPromisified(this.#boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.selectedPiece() ?? undefined)
                     .then(([move,]: [Move | undefined, number]) => {
                         if (move) {
                             this.#move(move)
