@@ -4,7 +4,8 @@ import { AmbientLight, CylinderGeometry, Mesh, MeshStandardMaterial } from 'thre
 import { Position } from '../definitions';
 import { GameEngine } from '../game-engine';
 
-export const DiscArgs = [17, 17, 10, 100];
+// The arguments for the cylinder geometry: [radiusTop, radiusBottom, height, radialSegments]
+export const DiscArgs = [18, 18, 5, 100];
 
 extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
 
@@ -31,18 +32,28 @@ export class PositionSlotComponent {
     discArgs = DiscArgs;
 
     slotPointerOver(event: NgtThreeEvent<MouseEvent>) {
-        event.stopPropagation();
-        this.game.hoverAvailablePosition(this.position());
+        if (!this.anyWinner()) {
+            event.stopPropagation();
+            this.game.hoverAvailablePosition(this.position());
+        }
     }
 
     slotPointerOut(event: NgtThreeEvent<MouseEvent>) {
-        event.stopPropagation();
-        this.game.hoverAvailablePosition(null);
+        if (!this.anyWinner()) {
+            event.stopPropagation();
+            this.game.hoverAvailablePosition(null);
+        }
     }
 
     slotClicked(event: NgtThreeEvent<MouseEvent>) {
-        event.stopPropagation();
-        this.game.userMove(this.position());
+        if (!this.anyWinner()) {
+            event.stopPropagation();
+            this.game.userMove(this.position());
+        }
+    }
+
+    private anyWinner() {
+        return ['UserWon', 'CPUWon'].includes(this.game.currentState());
     }
 }
 

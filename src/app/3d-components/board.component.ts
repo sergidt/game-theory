@@ -29,7 +29,7 @@ extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
 
         @if (showPositionSlots()) {
           <ngt-group>
-            @for (position of game.userAvailablePositions(); track $index) {
+            @for (position of slotPositions(); track $index) {
               <position-slot [position]="position"/>
             }
           </ngt-group>
@@ -48,6 +48,15 @@ export class BoardComponent {
     game = inject(GameEngine);
 
     showPositionSlots = computed(() => ['UserPlacingPiece', 'UserWon', 'CPUWon'].includes(this.game.currentState()));
+
+    slotPositions = computed(() => {
+        if (!this.showPositionSlots())
+            return [];
+        else if (this.game.currentState() === 'UserPlacingPiece')
+            return this.game.userAvailablePositions();
+        else
+            return this.game.winningLine()?.positions ?? [];
+    });
 
     board = injectLoader(() => GLTFLoader, () => '/assets/board.glb');
 }
