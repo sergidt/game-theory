@@ -17,7 +17,7 @@ extend({ Mesh, MeshStandardMaterial, CylinderGeometry, AmbientLight });
                 (pointerover)="slotPointerOver($event)"
                 (pointerout)="slotPointerOut($event)"
                 (click)="slotClicked($event)">
-        <ngt-mesh-standard-material [color]="this.game.availablePositionHovered() === position() ? 'indianred': 'pink'"/>
+        <ngt-mesh-standard-material [color]=" game.winningLine()?.win ? 'orange' : this.game.availablePositionHovered() === position() ? 'indianred': 'pink'"/>
         <ngt-cylinder-geometry *args="discArgs"/>
       </ngt-mesh>
     `,

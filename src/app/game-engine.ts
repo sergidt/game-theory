@@ -145,9 +145,10 @@ export class GameEngine {
         }
     };
 
-    /*
-    It is not a performant algorithm
-    */
+    /**
+     * It is not a performant algorithm that determines the next piece for the CPU to select. It returns a Promise that resolves to a
+     * PieceCharacteristics object.
+     */
     #cpuSelectingNextUserPiece(): Promise<PieceCharacteristics> {
         return new Promise(resolve => {
             const availablePieces = this.#boardController.getAvailablePieces();
@@ -155,16 +156,22 @@ export class GameEngine {
             if (availablePieces.length > 13) // less than 3 pieces are placed, impossible to win, yet
                 resolve(shuffleArray(availablePieces)[0]);
             else {
+                // If there are 13 or fewer pieces, the method evaluates possible moves to find the best one. It creates an array of possible moves
                 const possibleMoves: Array<Move & { win: boolean; value: number; }> = this.#boardController.getPossibleMoves()
                                                                                           .map(_ => ({ ..._, value: -1, win: false }));
 
+                //For each move, the method simulates the move on the board, evaluates the board state,
+                // and checks if the move results in a win. It then undoes the move to restore the board state
                 possibleMoves.forEach(move => {
                     const board = this.#boardController.move(move);
                     move.value = evaluateBoard(board);
                     move.win = gameWinner(board).win;
                     this.#boardController.undo();
                 });
+                console.log('possible moves', possibleMoves);
 
+                //Finally, the method sorts the possible moves by their evaluation value and selects the first move that does not result in a win for
+                // the opponent
                 resolve(possibleMoves.sort((a, b) => a.value - b.value).find(_ => !_.win)!.piece as PieceCharacteristics);
             }
         });
