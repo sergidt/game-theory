@@ -46,7 +46,7 @@ import { GameGuideComponent } from './game-guide.component';
       <div class="main-content">
         <ngt-canvas #canvas
                     [sceneGraph]="sceneGraph"
-                    [camera]="{position: [8,-6,6], fov: 40}"/>
+                    [camera]="{position: [8,-6,6], fov: 60}"/>
 
         <div class="guide-panel">
           <game-guide/>

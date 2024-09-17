@@ -36,11 +36,11 @@ export function getSingleCharacteristic(piece: Piece, characteristic: 'Size' | '
 }
 
 export function getPossibleMoves(board: Board, withPiece?: PieceCharacteristics): Array<Move> {
-  const availablePieces = withPiece ? [withPiece] : getAvailablePieces(board);
+  const availablePieces = !nil(withPiece) ? [withPiece] : getAvailablePieces(board);
   const availableMoves: Array<Move> = [];
 
   getEmptyPositions(board)
-    .forEach(({ col, row }) => availablePieces.forEach(piece => availableMoves.push({ row, col, piece })));
+    .forEach(({ col, row }) => availablePieces.forEach(piece => availableMoves.push({ row, col, piece: piece! })));
 
   return availableMoves;
 }
@@ -109,3 +109,5 @@ export async function randomSleep() {
   const sleep = Math.min(rand * 5000, 3000);
   return new Promise(resolve => setTimeout(resolve, sleep));
 }
+
+export const nil = (value: any) => value === null || value === undefined;

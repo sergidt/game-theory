@@ -1,4 +1,4 @@
-import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import anime from 'animejs';
 import { toObservableSignal } from 'ngxtension/to-observable-signal';
@@ -23,11 +23,6 @@ export class GameEngine {
 
   constructor() {
     this.#cpuStatesManagement();
-
-    effect(() => {
-      console.log(`[Game Engine] -> selected piece: ${this.selectedPiece() || ''}`, this.selectedPiece() ?
-        describePiece(this.selectedPiece()!) : 'None');
-    });
   }
 
   describeSelectedPiece() {
@@ -60,10 +55,10 @@ export class GameEngine {
   registerMesh = (piece: PieceCharacteristics, mesh: Mesh) => this.#renderedMeshes.set(piece, mesh);
 
   toggleSelection(piece: PieceCharacteristics) {
-    console.log('current selection ->', this.currentState());
-    console.log('toggle selection ->', piece, describePiece(piece));
     this.selectedPiece.set(this.selectedPiece() === piece ? null : piece);
   }
+
+
 
   hoverAvailablePosition = (position: Position | null) => this.availablePositionHovered.set(position);
 
@@ -172,9 +167,9 @@ export class GameEngine {
           move.win = gameWinner(board).win;
           this.#boardController.undo();
         });
-        console.log('possible moves', possibleMoves.sort((a, b) => a.value - b.value).filter(_ => !_.win));
+
         const selectedPiece = possibleMoves.sort((a, b) => a.value - b.value).find(_ => !_.win)!.piece as PieceCharacteristics;
-        console.log('piece: ', describePiece(selectedPiece));
+
 
         //Finally, the method sorts the possible moves by their evaluation value and selects the first move that does not result in a win for
         // the opponent
@@ -195,7 +190,6 @@ export class GameEngine {
   #manageCPUStates(state: GameState) {
     switch (state) {
       case GameStates.CPUPlacingPiece:
-        console.log('CPUPlacingPiece -> selectedPiece: ', this.selectedPiece() ?? undefined);
         minimaxPromisified(this.#boardController, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, DEPTH, this.selectedPiece() ?? undefined)
           .then(([move,]: [Move | undefined, number]) => {
             if (move) {
@@ -219,7 +213,7 @@ export class GameEngine {
     await randomSleep();
     this.pieceSelectedByCPU(piece);
     this.nextState(GameActions.PieceSelected);
-    console.log('selected piece by cpu', piece, describePiece(piece));
+    console.log('selected piece by cpu: ', describePiece(piece));
   }
 
   nextState(action: GameAction) {
