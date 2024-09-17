@@ -7,20 +7,20 @@ import { GameEngine } from '../game-engine';
 import { getSingleCharacteristic } from '../game.utils';
 
 type GLTFResult = GLTF & {
-    nodes: {
-        imagetostl_mesh0: Mesh
-    }
-    materials: {
-        mat0: MeshStandardMaterial
-    }
+  nodes: {
+    imagetostl_mesh0: Mesh
+  }
+  materials: {
+    mat0: MeshStandardMaterial
+  }
 }
 
 extend({ Mesh, MeshPhysicalMaterial });
 
 @Component({
-    selector: 'game-piece',
-    standalone: true,
-    template: `
+  selector: 'game-piece',
+  standalone: true,
+  template: `
       @if (gltf(); as gltf) {
         <ngt-group [dispose]="null">
           <ngt-mesh [parameters]="position()"
@@ -40,39 +40,39 @@ extend({ Mesh, MeshPhysicalMaterial });
         </ngt-group>
       }
     `,
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    imports: [NgtArgs],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [NgtArgs],
 })
 export class GamePieceComponent {
-    piece = input.required<Piece>();
+  piece = input.required<Piece>();
 
-    protected game = inject(GameEngine);
+  protected game = inject(GameEngine);
 
-    protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
+  protected gltf = injectLoader(() => GLTFLoader, () => this.piece().path) as Signal<GLTFResult>;
 
-    SelectionColor = SELECTION_COLOR;
+  SelectionColor = SELECTION_COLOR;
 
-    protected piecePointed = computed(() => this.game.pointedPiece() === this.piece().characteristics);
-    protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece());
-    protected position = computed(() => ({ position: this.piece().position }));
-    protected color = computed(() => [LIGHT_COLOR, DARK_COLOR][getSingleCharacteristic(this.piece(), 'Colour')]);
+  protected piecePointed = computed(() => this.game.pointedPiece() === this.piece().characteristics);
+  protected selected = computed(() => this.piece().characteristics === this.game.selectedPiece());
+  protected position = computed(() => ({ position: this.piece().position }));
+  protected color = computed(() => [LIGHT_COLOR, DARK_COLOR][getSingleCharacteristic(this.piece(), 'Colour')]);
 
-    pointerOver(event: NgtThreeEvent<PointerEvent>) {
-        event.stopPropagation();
-        this.game.userPointingPiece(this.piece().characteristics);
-    }
+  pointerOver(event: NgtThreeEvent<PointerEvent>) {
+    event.stopPropagation();
+    this.game.userPointingPiece(this.piece().characteristics);
+  }
 
-    pointerOut(event: NgtThreeEvent<PointerEvent>) {
-        event.stopPropagation();
-        this.game.piecePointedOut();
-    }
+  pointerOut(event: NgtThreeEvent<PointerEvent>) {
+    event.stopPropagation();
+    this.game.piecePointedOut();
+  }
 
-    clicked(event: NgtThreeEvent<MouseEvent>) {
-        event.stopPropagation();
-        this.game.pieceSelectedByUser(this.piece().characteristics);
-    }
+  clicked(event: NgtThreeEvent<MouseEvent>) {
+    event.stopPropagation();
+    this.game.pieceSelectedByUser(this.piece().characteristics);
+  }
 
-    registerMesh({ node }: { node: Mesh }) {
-        this.game.registerMesh(this.piece().characteristics, node);
-    }
+  registerMesh({ node }: { node: Mesh }) {
+    this.game.registerMesh(this.piece().characteristics, node);
+  }
 }
